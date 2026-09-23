@@ -1,0 +1,31 @@
+.art {
+  display: block;
+  box-sizing: border-box;
+  flex: none;
+  object-fit: contain;
+}
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-2);
+  background: var(--surface-sunken);
+  border: 1px dashed var(--border-strong);
+}
+.caption {
+  font: var(--text-caption);
+  color: var(--ink-muted);
+}
+.sm {
+  border-radius: var(--radius-sm);
+}
+.md {
+  border-radius: var(--radius-md);
+}
+.lg {
+  border-radius: var(--radius-lg);
+}
+.full {
+  border-radius: var(--radius-full);
+}

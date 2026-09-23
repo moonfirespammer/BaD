@@ -1,0 +1,36 @@
+.row {
+  display: inline-flex;
+  gap: 6px;
+  padding: 2px;
+}
+.mini {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-sunken);
+}
+.round {
+  border-radius: var(--radius-full);
+}
+.square {
+  border-radius: 6px;
+}
+.diamond {
+  border-radius: 3px;
+  transform: rotate(45deg);
+}
+.img {
+  width: 12px;
+  height: 12px;
+  display: block;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.unrotate {
+  transform: rotate(-45deg);
+}

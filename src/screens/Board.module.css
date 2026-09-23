@@ -1,0 +1,135 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) 0;
+  min-height: 56px;
+  box-sizing: border-box;
+}
+.headerRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  color: var(--ink);
+}
+.city {
+  color: var(--ink-muted);
+}
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+}
+.link {
+  min-height: var(--touch-target);
+  padding: 0 var(--space-2);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-md);
+  color: var(--brand-text);
+  font: var(--text-body-strong);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.link:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+.caption {
+  margin: var(--space-1) 0 var(--space-4);
+}
+.banner {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.bannerLabel {
+  color: var(--brand-text);
+}
+.youAreIn {
+  margin: 0 0 var(--space-3);
+  font: var(--text-body-strong);
+  color: var(--brand-text);
+}
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.dish {
+  display: block;
+  width: 100%;
+  text-align: left;
+  box-sizing: border-box;
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+}
+.dish:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+.dishSelected {
+  border: 2px solid var(--brand);
+  padding: calc(var(--space-4) - 1px);
+}
+.dishTinted {
+  background: var(--brand-subtle);
+}
+.dishTop {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+.dishText {
+  flex: 1;
+  min-width: 0;
+}
+.dishName {
+  font: var(--text-heading-sm);
+  letter-spacing: var(--tracking-heading-sm);
+}
+.dishBottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+.stock {
+  font: var(--text-caption);
+  flex: 1;
+  min-width: 0;
+}
+.cooks {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: none;
+}
+.avatars {
+  display: flex;
+  padding-left: 6px;
+}
+.stacked {
+  margin-left: -6px;
+}
+.count {
+  font: var(--text-body-strong);
+}
+.footer {
+  margin: var(--space-5) 0 0;
+  text-align: center;
+}

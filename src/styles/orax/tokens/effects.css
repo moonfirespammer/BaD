@@ -1,0 +1,21 @@
+/* OraX shadows, glow and motion. Cards use border, not shadow. The only things that glow are gems. */
+:root {
+  --shadow-socket: inset 0 3px 8px rgba(0, 0, 0, 0.6);
+  --shadow-raised: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --glow-ruby: 0 0 22px rgba(194, 42, 76, 0.6);
+  --glow-sapphire: 0 0 22px rgba(58, 111, 208, 0.6);
+  --glow-emerald: 0 0 22px rgba(39, 160, 107, 0.6);
+  --glow-brand: 0 0 22px rgba(138, 75, 194, 0.5);
+  --ring-active: 3px;
+  --focus-ring: 2px solid var(--focus);
+  --focus-offset: 2px;
+  /* Motion — quiet. Colour and glow settle, nothing bounces. Honour prefers-reduced-motion: the glow appears without animation. */
+  --motion-fast: 120ms; /* @kind other */
+  --motion-base: 200ms; /* @kind other */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1); /* @kind other */
+}
+[data-theme='light'] {
+  --shadow-socket: inset 0 3px 8px rgba(0, 0, 0, 0.18);
+  --shadow-raised: 0 8px 24px rgba(26, 26, 26, 0.12);
+  --glow-ruby: 0 0 22px rgba(142, 15, 44, 0.45);
+}

@@ -1,0 +1,108 @@
+/* OraX colour tokens (source: tokens.json). Dark is the default theme; add data-theme="light" to <html> or any wrapper for the light peer. */
+:root {
+  color-scheme: dark;
+  /* Grounds */
+  --surface: #1f1f22;
+  --surface-raised: #2a2a2f;
+  --surface-sunken: #161618;
+  --surface-overlay: #000000b3;
+  /* Ink */
+  --ink: #f2f0f5;
+  --ink-muted: #a8a4b3;
+  --ink-faint: #6e6a7a;
+  --border: #3a3a41;
+  --border-strong: #6e6e7a;
+  /* Logo inks — fixed in both themes, the mark is never reversed */
+  --logo-ring: #1a1a1a;
+  --logo-plate: #333333;
+  /* Brand purple */
+  --brand: #8a4bc2;
+  --brand-deep: #40145c;
+  --brand-text: #b98fd9;
+  --brand-subtle: #4f1b7233;
+  --on-brand: #ffffff;
+  --focus: #d1b3ee;
+  /* Status — text and icon colours, always beside a word or icon */
+  --success: #6fd0a0;
+  --warning: #f0b84a;
+  --danger: #e8607a;
+  --info: #7ea3ea;
+  /* Gem facet ramps — identical in both themes, used only inside the stone and its glow */
+  --gem-ruby-glint: #e8607a;
+  --gem-ruby-light: #c22a4c;
+  --gem-ruby-base: #8e0f2c;
+  --gem-ruby-deep: #5a071b;
+  --gem-ruby-shadow: #2e030d;
+  --gem-sapphire-glint: #7ea3ea;
+  --gem-sapphire-light: #3a6fd0;
+  --gem-sapphire-base: #153d8f;
+  --gem-sapphire-deep: #0b2560;
+  --gem-sapphire-shadow: #051235;
+  --gem-emerald-glint: #6fd0a0;
+  --gem-emerald-light: #27a06b;
+  --gem-emerald-base: #0d6b45;
+  --gem-emerald-deep: #064328;
+  --gem-emerald-shadow: #032415;
+  /* Gem semantic — per theme */
+  --gem-ruby-text: #e8607a;
+  --gem-ruby-fill: #c22a4c;
+  --gem-ruby-on: #ffffff;
+  --gem-sapphire-text: #7ea3ea;
+  --gem-sapphire-fill: #3a6fd0;
+  --gem-sapphire-on: #ffffff;
+  --gem-emerald-text: #6fd0a0;
+  --gem-emerald-fill: #27a06b;
+  --gem-emerald-on: #14101a;
+  /* Class accents — class name and avatar ring only, never a socket */
+  --class-provider: #c8923a;
+  --class-foodsmith: #7f95c4;
+  --class-spark: #e88a72;
+  --class-gastronaut: #6f9dbd;
+  --class-taster: #9aa4b8;
+  --class-purist: #d6d0c4;
+  --class-rebel: #c46a6a;
+  --class-stirrer: #8fa0d0;
+  --class-host: #b48aa8;
+}
+[data-theme='light'] {
+  color-scheme: light;
+  --surface: #f7f5fa;
+  --surface-raised: #ffffff;
+  --surface-sunken: #e9e6ef;
+  --surface-overlay: #1a1a1a80;
+  --ink: #1a1a1a;
+  --ink-muted: #5c5866;
+  --ink-faint: #8f8a9c;
+  --border: #cfcbd8;
+  --border-strong: #7d788c;
+  --logo-ring: #1a1a1a;
+  --logo-plate: #333333;
+  --brand: #4f1b72;
+  --brand-deep: #40145c;
+  --brand-text: #4f1b72;
+  --brand-subtle: #4f1b7214;
+  --on-brand: #ffffff;
+  --focus: #6a2a99;
+  --success: #0d6b45;
+  --warning: #8a5a00;
+  --danger: #8e0f2c;
+  --info: #153d8f;
+  --gem-ruby-text: #8e0f2c;
+  --gem-ruby-fill: #8e0f2c;
+  --gem-ruby-on: #ffffff;
+  --gem-sapphire-text: #153d8f;
+  --gem-sapphire-fill: #153d8f;
+  --gem-sapphire-on: #ffffff;
+  --gem-emerald-text: #0d6b45;
+  --gem-emerald-fill: #0d6b45;
+  --gem-emerald-on: #ffffff;
+  --class-provider: #8a5f1c;
+  --class-foodsmith: #1e2a4a;
+  --class-spark: #b8402a;
+  --class-gastronaut: #2f5f80;
+  --class-taster: #3a4256;
+  --class-purist: #4a4640;
+  --class-rebel: #7a2a2a;
+  --class-stirrer: #2c3a6b;
+  --class-host: #4a2a3a;
+}

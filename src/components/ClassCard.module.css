@@ -1,0 +1,49 @@
+.card {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--surface-raised);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  color: var(--ink);
+}
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.text {
+  flex: 1;
+  min-width: 0;
+}
+.name {
+  font: var(--text-heading-sm);
+  letter-spacing: var(--tracking-heading-sm);
+}
+.role {
+  font: var(--text-overline);
+  letter-spacing: var(--tracking-overline);
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.slot {
+  font: var(--text-caption);
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+.gems {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin: var(--space-4) 0;
+}
+.footer {
+  font: var(--text-pixel-label);
+  letter-spacing: var(--tracking-pixel-label);
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--ink-muted);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+}
