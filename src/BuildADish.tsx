@@ -4,6 +4,7 @@ import { Toast } from '@/components/Toast';
 import { Board } from '@/screens/Board';
 import { CursedPlates } from '@/screens/CursedPlates';
 import { Intro } from '@/screens/Intro';
+import { Station } from '@/screens/Station';
 import { useGame } from '@/store/game';
 import type { City } from '@/game/types';
 import type { PoolService } from '@/services/PoolService';
@@ -76,6 +77,7 @@ export function BuildADish({
           <Route path="/intro" element={<IntroRoute city={city} />} />
           <Route path="/board" element={<Board />} />
           <Route path="/cursed" element={<CursedPlates />} />
+          <Route path="/station" element={<Station />} />
           <Route path="*" element={<Navigate to="/board" replace />} />
         </Routes>
       </MemoryRouter>

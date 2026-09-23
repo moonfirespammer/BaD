@@ -19,6 +19,17 @@ const SCREENS: { name: string; chip: string; app: (page: Page) => Promise<void> 
       await page.getByRole('button', { name: /^Cursed Plates · \d+$/ }).click();
     },
   },
+  {
+    name: 'station',
+    chip: 'Station',
+    app: async (page) => {
+      await skipIntro(page);
+      await page.getByRole('button', { name: /^Hainanese chicken rice/ }).click();
+      await page.getByRole('button', { name: 'Pick chicken rice for today' }).click();
+      await page.getByRole('button', { name: 'Cook chicken rice' }).click();
+      await page.waitForTimeout(3000); // let the pick toast clear, as in the prototype jump
+    },
+  },
   ...(['Play', 'Classes', 'You'] as const).map((tab) => ({
     name: tab.toLowerCase(),
     chip: tab,

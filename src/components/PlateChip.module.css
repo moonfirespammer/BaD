@@ -1,0 +1,31 @@
+.chip {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: var(--touch-target);
+  padding: var(--space-1) var(--space-3);
+  box-sizing: border-box;
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+.chip:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+.selected {
+  background: var(--brand-subtle);
+  border: 2px solid var(--brand);
+  padding: calc(var(--space-1) - 1px) calc(var(--space-3) - 1px);
+}
+.label {
+  font: var(--text-body-strong);
+}
+.prep {
+  font: var(--text-caption);
+  color: var(--ink-muted);
+}

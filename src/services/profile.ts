@@ -25,6 +25,7 @@ export function freshProfile(month: string, d: ProfileDefaults = {}): Profile {
     gem: d.gem ?? 'ruby',
     figure: 't1m',
     introSeen: false,
+    preferButtons: false,
     cursedPlates: [],
     habits: { chilli: 0, rawRice: 0, unhinged: 0, plates: 0, month },
   };

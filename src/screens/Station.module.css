@@ -1,0 +1,112 @@
+.countdown {
+  color: var(--ink-muted);
+  white-space: nowrap;
+  flex: none;
+}
+.scroll {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+}
+.banner {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+}
+.bannerLabel {
+  color: var(--brand-text);
+}
+.plate {
+  padding: var(--space-3) var(--space-4);
+}
+.plateHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+.plateLabel {
+  color: var(--ink);
+  text-align: right;
+}
+.empty {
+  margin-top: var(--space-2);
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+.applyRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+.applyName {
+  color: var(--ink);
+  font-weight: 500;
+}
+.fling {
+  min-height: var(--touch-target);
+  min-width: var(--touch-target);
+  margin: calc(-1 * var(--space-1)) 0;
+  padding: 0 var(--space-2);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  color: var(--brand-text);
+  font: var(--text-caption);
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.fling:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+.buttonsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: calc(-1 * var(--space-1));
+}
+.prepButtons {
+  display: flex;
+  gap: var(--space-2);
+}
+.pantryHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+.capText {
+  text-align: right;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+.subhead {
+  margin-top: var(--space-4);
+}
+.extrasCaption {
+  margin-top: 2px;
+}
+.footer {
+  padding-bottom: var(--space-3);
+}
+.plateHint {
+  margin-top: var(--space-1);
+  text-align: center;
+}

@@ -45,5 +45,6 @@
   "Emerald": "Gem name from the OraX design system",
   "sapphires": "Plural for `{n} of 3 rubies` with a Sapphire player (spec §3.5: stones in the player's own gem)",
   "emeralds": "Plural for `{n} of 3 rubies` with an Emerald player (spec §3.5: stones in the player's own gem)",
-  "OraX": "Logo alt text: the brand name"
+  "OraX": "Logo alt text: the brand name",
+  "No cap on anything the city still has plenty of.": "Spec §5 gives the Station's Leftovers banner a caption with no text; prototype Station caption"
 }

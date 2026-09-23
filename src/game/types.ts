@@ -140,6 +140,8 @@ export interface Profile {
   gem: Gem;
   figure: Figure;
   introSeen: boolean;
+  /** Spec §10: Cut and Heat buttons under the sigil pad (the gesture-free path). */
+  preferButtons?: boolean;
   signature?: SavedVerdict;
   cursedPlates: SavedVerdict[];
   habits: Habits;

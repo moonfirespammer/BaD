@@ -34,7 +34,7 @@ const note = (s, where, kind) => {
 // 1. Copy table.
 const { COPY } = await load('src/game/content/copy.ts');
 // The namer's word lists and the tab names are listed in the spec's prose (§3.6, §1), not as quoted spans.
-const CONTENT_PATHS = ['namer.tones', 'namer.bases', 'namer.details', 'app.tabs'];
+const CONTENT_PATHS = ['namer.tones', 'namer.bases', 'namer.details', 'app.tabs', 'prep.', 'sigils.'];
 const walkValues = (v, path) =>
   typeof v === 'string'
     ? note(v, 'src/game/content/copy.ts', CONTENT_PATHS.some((p) => path.startsWith(p)) ? 'content' : 'copy')
@@ -79,16 +79,24 @@ for (const file of walkTsx(join(root, 'src'))) {
     true,
     ts.ScriptKind.TSX,
   );
+  // `placeholder` is user-facing only on native elements; on components (Art) it is a setting.
+  const isUiAttr = (attr) => {
+    const name = attr.name.getText(sf);
+    if (!UI_ATTRS.has(name)) return false;
+    if (name !== 'placeholder') return true;
+    const tag = attr.parent.parent.tagName.getText(sf);
+    return /^[a-z]/.test(tag);
+  };
   const visit = (n) => {
     if (ts.isJsxText(n)) note(n.text, where, 'ui');
-    else if (ts.isJsxAttribute(n) && UI_ATTRS.has(n.name.getText(sf)) && n.initializer) {
+    else if (ts.isJsxAttribute(n) && isUiAttr(n) && n.initializer) {
       const init = ts.isJsxExpression(n.initializer) ? n.initializer.expression : n.initializer;
       if (init && (ts.isStringLiteral(init) || ts.isTemplateLiteral(init)))
         note(templateText(init), where, 'ui');
     } else if (
       (ts.isStringLiteral(n) || ts.isNoSubstitutionTemplateLiteral(n)) &&
       !ts.isImportDeclaration(n.parent) &&
-      !(ts.isJsxAttribute(n.parent) && !UI_ATTRS.has(n.parent.name.getText(sf))) &&
+      !(ts.isJsxAttribute(n.parent) && !isUiAttr(n.parent)) &&
       /^[A-Z][a-z]+ [^{}]*[a-z]/.test(n.text) &&
       !/var\(|--|\bpx\b|rgba?\(/.test(n.text)
     ) {

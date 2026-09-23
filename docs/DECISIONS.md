@@ -48,6 +48,9 @@ Leftovers hour lifts the cap above 25 (plenty and moderate), per spec §3.3.
 | `StockState` | `'plenty' \| 'moderate' \| 'low' \| 'gone'` | Q5 (spec had three states). |
 | `PoolService` | `getPick`, `getPlate`, `fling`, `report`, `mute` | Restore state on reload; fling bumps the Bin-eaten counter (spec §3.4); moderation stubs (Phase 4). |
 | `<BuildADish>` | `clock?`, `onImmersiveChange?` props | Time source for tests and dev; lets the host hide its tab bar (spec §5). |
+| `PoolService` | `saveDraft(plate)` (Phase 2) | The in-progress plate's prep, flair and mess survive a reload; portions stay server-owned. |
+| `Profile` | `preferButtons?: boolean` (Phase 2) | Spec §10 "Prefer buttons" setting (Cut and Heat buttons under the pad). |
+| `<Art>` | `placeholder: 'box' \| 'blob'` (Phase 2) | Mess splats go through Art (slot `mess`, `splat-1…4`) with the spec's blob as the stand-in. |
 
 ## Stack deviations
 
@@ -60,3 +63,19 @@ Leftovers hour lifts the cap above 25 (plenty and moderate), per spec §3.3.
 - Class tiles sit on the sunken ground in dark and the raised ground in light, so every class colour reaches 4.5:1.
 - Card borders 1px (prototype 2px), per Q13.
 - Picked dish no longer outlined while another dish is selected (spec: 2px only when selected).
+
+## Phase 2 (Station) — defaults taken where the spec is silent or ambiguous
+
+These follow the questions register's literal readings; each is listed in the Phase 2 report for the owner.
+
+- **Header**: dish name with ellipsis; caption is the local name (Mutton soup → "Sup kambing", Q1) since cuisine tags are hidden (Q10); countdown reads `RESETS hh:mm:ss` (spec §3.1).
+- **Pantry state words**: spec §2/§5 — only `Running low` and `Gone` show on Pantry cards (the Board's four stock words, Q5, apply to the Board only). `Running low` is never shortened to the prototype's "Low".
+- **Cap refusal**: the three lines rotate per session (1st, 2nd, 3rd refusal …); the prototype indexed by portion count and never rotated.
+- **Fling remark**: rotates per fling; flung portions are eaten (Phase 1 fix). Fling adds mess (spec) and therefore a splat (one splat per mess point).
+- **Taps**: every Pantry tap selects the ingredient, including refused and Gone taps (prototype).
+- **Strokes**: flair counts on every fast stroke; PLATE and CLEAN need no target; CUT/HEAT without a target flash the word and say `Strokes need a target. Tap something first.` (prototype order).
+- **Wipe threshold**: length ≥ 55 % of the pad width (spec ≥; prototype used >).
+- **Plate it / flick up**: flashes PLATE and calls `PoolService.plate`; the judge and the Verdict arrive in Phase 3.
+- **Prefer buttons**: a switch directly under the sigil pad reveals `Cut` and `Heat`; persisted on the profile. No wipe button (mess is an optional toy, spec §2).
+- **Accessibility**: a Gone card's state caption sits inside its `aria-disabled` add button (an inactive control, exempt from the 4.5:1 text rule), keeping the spec's `--ink-faint`. The empty-plate caption uses `--ink-muted` (the spec gives no colour). `Fling to the Bin` has a 44px hit target (prototype 36px).
+- **Pad hint**: the spec's `SLASH TO CUT · SPIRAL TO HEAT · FLICK UP TO PLATE` wraps to two centred lines (the prototype shortened it to one).

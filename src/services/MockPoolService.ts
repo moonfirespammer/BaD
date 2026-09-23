@@ -282,6 +282,23 @@ export class MockPoolService implements PoolService {
     });
   }
 
+  saveDraft(plate: Plate): Promise<void> {
+    return this.exclusive(async (day) => {
+      const lvl = (v: number): 0 | 1 | 2 | 3 => Math.max(0, Math.min(3, Math.round(v))) as 0 | 1 | 2 | 3;
+      const client = new Map(plate.items.map((i) => [i.ingredientId, i]));
+      // Portions (n) stay as the pool counted them; the client owns prep, flair and mess.
+      day.plate = {
+        items: day.plate.items.map((i) => {
+          const c = client.get(i.ingredientId);
+          return c ? { ...i, cut: lvl(c.cut), heat: lvl(c.heat) } : i;
+        }),
+        flair: Math.max(0, Math.round(plate.flair)),
+        mess: Math.max(0, Math.round(plate.mess)),
+      };
+      await this.save();
+    });
+  }
+
   plate(_plate: Plate): Promise<Verdict> {
     return Promise.reject(new NotImplementedError('plate'));
   }
