@@ -60,11 +60,15 @@ describe('canTake (soft cap, Leftovers rule, Gone)', () => {
 
 describe('dishStockState', () => {
   it('reports the worst required ingredient, ignoring the main one', () => {
-    expect(dishStockState('chicken-rice', STOCK0)).toBe('gone'); // cucumber 0
-    expect(dishStockState('aglio-olio', STOCK0)).toBe('low'); // parmesan 14
-    expect(dishStockState('fish-chips', STOCK0)).toBe('moderate'); // peas 38
-    expect(dishStockState('mutton-soup', STOCK0)).toBe('low'); // coriander 19
-    expect(dishStockState('fish-chips', { ...STOCK0, peas: 60, lemon: 60 })).toBe('plenty');
+    expect(dishStockState('chicken-rice', STOCK0)).toBe('plenty');
+    expect(dishStockState('aglio-olio', STOCK0)).toBe('moderate'); // garlic 47
+    expect(dishStockState('chicken-rice', { ...STOCK0, cucumber: 0 })).toBe('gone');
+    expect(dishStockState('aglio-olio', { ...STOCK0, parmesan: 14 })).toBe('low');
+    expect(dishStockState('fish-chips', { ...STOCK0, peas: 60, lemon: 60, fish: 0 })).toBe('plenty');
+    expect(() => dishStockState('laksa', STOCK0)).toThrow();
+  });
+  it('every shelf starts the day above 25, so nothing reads running low or all out at 00:00', () => {
+    for (const [id, n] of Object.entries(STOCK0)) expect(n, id).toBeGreaterThan(25);
   });
 });
 

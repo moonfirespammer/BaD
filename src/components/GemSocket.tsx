@@ -1,3 +1,4 @@
+import { COPY, fill } from '@/game/content/copy';
 import type { Gem } from '@/game/types';
 import { GEMS } from '@/game/content/identity';
 import styles from './GemSocket.module.css';
@@ -52,7 +53,7 @@ export function GemSocket({ gem, active = false, size = 72, onClick, label }: Ge
         className={`${styles.socket} ${styles.interactive}`}
         style={{ width: size, height: size }}
         aria-pressed={active}
-        aria-label={label ?? `${g.name} gem`}
+        aria-label={label ?? fill(COPY.a11y.gem, { Gem: g.name })}
         onClick={onClick}
       >
         {img}
@@ -64,7 +65,7 @@ export function GemSocket({ gem, active = false, size = 72, onClick, label }: Ge
       className={styles.socket}
       style={{ width: size, height: size }}
       role="img"
-      aria-label={label ?? `${g.name} gem${active ? ', active' : ''}`}
+      aria-label={label ?? fill(active ? COPY.a11y.gemActive : COPY.a11y.gem, { Gem: g.name })}
     >
       {img}
     </div>

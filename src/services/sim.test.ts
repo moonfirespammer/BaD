@@ -13,7 +13,7 @@ describe('Simulation (deterministic city)', () => {
     expect(kl.counts).not.toEqual(a.counts);
   });
   it('starts the day with the prototype counts and avatars', () => {
-    const s = new Simulation('SG', '2026-09-23').stateAt(10);
+    const s = new Simulation('SG', '2026-09-23').stateAt(0);
     expect(s.counts).toEqual(SEED_COUNTS);
     expect(s.cooks['chicken-rice']).toEqual([
       { classKey: 'taster', figure: 't1f' },
@@ -21,7 +21,8 @@ describe('Simulation (deterministic city)', () => {
       { classKey: 'host', figure: 't1f' },
     ]);
     expect(s.binEaten).toBe(0);
-    expect(s.nextEventAt).toBeGreaterThan(10);
+    expect(s.nextEventAt).toBeGreaterThan(0);
+    expect(s.drained).toEqual({});
   });
   it('counts and the Bin-eaten counter grow over the day, stock never goes negative, mains are untouched', () => {
     const sim = new Simulation('SG', '2026-09-23');
@@ -56,6 +57,19 @@ describe('Simulation (deterministic city)', () => {
       }
       const times = wall.map((r) => r.platedAt);
       expect([...times].sort()).toEqual(times);
+    }
+  });
+  it('every simulated cook picks at most once a day', () => {
+    const s = new Simulation('SG', '2026-09-23').stateAt(864e5 - 1);
+    const ids = Object.values(s.wall)
+      .flat()
+      .map((r) => r.playerId);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+  it('drained is the unfloored demand behind the floored stock', () => {
+    const s = new Simulation('SG', '2026-09-23').stateAt(864e5 - 1);
+    for (const [id, n] of Object.entries(s.drained)) {
+      expect(s.stock[id]).toBe(Math.max(0, (STOCK0[id] ?? 0) - n));
     }
   });
 });

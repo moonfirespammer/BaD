@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { City, DayBoard, Pick, Plate, Profile } from '@/game/types';
-import type { PoolService } from '@/services/PoolService';
+import { PoolError, type PoolService } from '@/services/PoolService';
 import type { Clock } from '@/services/clock';
 import type { ProfileStore } from '@/services/profile';
 import { dish } from '@/game/content/dishes';
@@ -22,6 +22,8 @@ interface GameState {
   pick: Pick | null;
   plate: Plate;
   selectedDish: string | null;
+  /** True while a pick or swap is in flight: the CTA is disabled so a double tap does nothing. */
+  busy: boolean;
   /** Ticks once a second for the countdown. */
   now: number;
   init: (deps: GameDeps) => Promise<void>;
@@ -36,6 +38,13 @@ interface GameState {
 let unsubscribe: (() => void) | null = null;
 let unsubscribeProfile: (() => void) | null = null;
 let tick: ReturnType<typeof setInterval> | null = null;
+/** Bumped by every init and dispose; an init that finds a newer generation after its awaits gives up. */
+let generation = 0;
+
+/** A refused action (already picked, no swaps left, ...) is a no-op for the player; anything else is a bug. */
+function ignorePoolError(e: unknown): void {
+  if (!(e instanceof PoolError)) throw e;
+}
 
 export const useGame = create<GameState>((set, get) => ({
   ready: false,
@@ -45,15 +54,18 @@ export const useGame = create<GameState>((set, get) => ({
   pick: null,
   plate: { items: [], flair: 0, mess: 0 },
   selectedDish: null,
+  busy: false,
   now: Date.now(),
   init: async (deps) => {
     get().dispose();
+    const mine = ++generation;
     const profile = await deps.profileStore.load(deps.clock.city().month);
     const [board, pick, plate] = await Promise.all([
       deps.service.getToday(deps.city),
       deps.service.getPick(),
       deps.service.getPlate(),
     ]);
+    if (mine !== generation) return; // disposed or re-initialised meanwhile (React StrictMode double mount)
     set({
       deps,
       profile,
@@ -61,6 +73,7 @@ export const useGame = create<GameState>((set, get) => ({
       pick,
       plate,
       selectedDish: pick?.dishId ?? null,
+      busy: false,
       now: deps.clock.now(),
       ready: true,
     });
@@ -68,9 +81,9 @@ export const useGame = create<GameState>((set, get) => ({
       const prev = get().board;
       // Day rollover: the pool, pick and plate reset together (spec §3.1).
       if (prev && prev.date !== b.date) {
-        void Promise.all([deps.service.getPick(), deps.service.getPlate()]).then(([p, pl]) =>
-          set({ board: b, pick: p, plate: pl, selectedDish: p?.dishId ?? null }),
-        );
+        void Promise.all([deps.service.getPick(), deps.service.getPlate()]).then(([p, pl]) => {
+          if (mine === generation) set({ board: b, pick: p, plate: pl, selectedDish: p?.dishId ?? null });
+        });
         return;
       }
       set({ board: b });
@@ -79,6 +92,7 @@ export const useGame = create<GameState>((set, get) => ({
     tick = setInterval(() => set({ now: deps.clock.now() }), 1000);
   },
   dispose: () => {
+    generation += 1;
     unsubscribe?.();
     unsubscribeProfile?.();
     if (tick) clearInterval(tick);
@@ -88,19 +102,33 @@ export const useGame = create<GameState>((set, get) => ({
   },
   selectDish: (dishId) => set({ selectedDish: dishId }),
   pickSelected: async () => {
-    const { deps, selectedDish } = get();
-    if (!deps || !selectedDish) return;
-    const pick = await deps.service.pick(selectedDish);
-    set({ pick, selectedDish: pick.dishId });
-    remark(fill(COPY.bin.picked, { Dish: dish(pick.dishId).short }));
+    const { deps, selectedDish, busy } = get();
+    if (!deps || !selectedDish || busy) return;
+    set({ busy: true });
+    try {
+      const pick = await deps.service.pick(selectedDish);
+      set({ pick, selectedDish: pick.dishId });
+      remark(fill(COPY.bin.picked, { Dish: dish(pick.dishId).short }));
+    } catch (e) {
+      ignorePoolError(e);
+    } finally {
+      set({ busy: false });
+    }
   },
   swapToSelected: async () => {
-    const { deps, selectedDish } = get();
-    if (!deps || !selectedDish) return;
-    const pick = await deps.service.swap(selectedDish);
-    const plate = await deps.service.getPlate();
-    set({ pick, plate, selectedDish: pick.dishId });
-    remark(fill(COPY.bin.swapped, { dish: dish(pick.dishId).short.toLowerCase() }));
+    const { deps, selectedDish, busy } = get();
+    if (!deps || !selectedDish || busy) return;
+    set({ busy: true });
+    try {
+      const pick = await deps.service.swap(selectedDish);
+      const plate = await deps.service.getPlate();
+      set({ pick, plate, selectedDish: pick.dishId });
+      remark(fill(COPY.bin.swapped, { dish: dish(pick.dishId).short.toLowerCase() }));
+    } catch (e) {
+      ignorePoolError(e);
+    } finally {
+      set({ busy: false });
+    }
   },
   markIntroSeen: async () => {
     const { deps } = get();

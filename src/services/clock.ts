@@ -26,7 +26,8 @@ export function cityTime(nowMs: number): CityTime {
 
 /** Countdown to 00:00 city time as `hh:mm:ss` (spec §3.1). */
 export function resetIn(nowMs: number): string {
-  const left = DAY_MS - cityTime(nowMs).msSinceMidnight;
+  // At exactly 00:00 the day has just reset: show 00:00:00, never 24:00:00.
+  const left = (DAY_MS - cityTime(nowMs).msSinceMidnight) % DAY_MS;
   return `${pad2(Math.floor(left / 36e5))}:${pad2(Math.floor(left / 6e4) % 60)}:${pad2(Math.floor(left / 1e3) % 60)}`;
 }
 

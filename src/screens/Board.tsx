@@ -38,7 +38,7 @@ function DishCard({
   return (
     <button
       type="button"
-      className={`${styles.dish} ${selected || picked ? styles.dishSelected : ''} ${selected && !picked ? styles.dishTinted : ''}`}
+      className={`${styles.dish} ${selected ? styles.dishSelected : ''} ${selected && !picked ? styles.dishTinted : ''}`}
       aria-pressed={selected}
       onClick={onSelect}
       title={d.local}
@@ -93,6 +93,7 @@ export function Board() {
   const selectDish = useGame((g) => g.selectDish);
   const pickSelected = useGame((g) => g.pickSelected);
   const swapToSelected = useGame((g) => g.swapToSelected);
+  const busy = useGame((g) => g.busy);
   if (!board || !deps || !profile) return null;
   const cityName = CITY_NAME[board.city];
   const countdown = deps.clock.resetIn();
@@ -157,7 +158,7 @@ export function Board() {
         </p>
       </div>
       <div className={s.cta}>
-        <Button block disabled={cta.disabled} onClick={onCta}>
+        <Button block disabled={cta.disabled || busy} onClick={onCta}>
           {ctaLabel}
         </Button>
       </div>

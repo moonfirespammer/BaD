@@ -21,7 +21,7 @@ export function Intro({ city, onDone }: { city: City; onDone: () => void }) {
   const art = ART[step] ?? ART[0];
   const last = step === COPY.intro.beats.length - 1;
   return (
-    <main className={`${s.screen} ${styles.intro}`} aria-label="Intro">
+    <main className={`${s.screen} ${styles.intro}`} aria-label={COPY.a11y.intro}>
       <div className={styles.top}>
         <Logo height={32} />
         <span className={`${s.pixel} ${styles.label}`}>{COPY.app.pixelLabel}</span>

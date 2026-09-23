@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Tab } from '@/shell/TabBar';
+import type { Tab } from '@/components/TabBar';
 
 interface ShellState {
   tab: Tab;

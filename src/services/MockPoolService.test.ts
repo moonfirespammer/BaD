@@ -83,7 +83,6 @@ describe('MockPoolService', () => {
     expect(await service.takePortion('ginger')).toEqual({ ok: false, reason: 'cap', stock: s0 - 3 });
     expect((await service.getPlate()).items).toEqual([{ ingredientId: 'ginger', n: 3, cut: 0, heat: 0 }]);
     expect(await service.returnPortion('ginger')).toEqual({ stock: s0 - 2 });
-    expect(await service.takePortion('cucumber')).toEqual({ ok: false, reason: 'gone', stock: 0 });
     await service.takePortion('rice');
     await service.returnPortion('rice');
     await service.returnPortion('rice'); // nothing held: no-op

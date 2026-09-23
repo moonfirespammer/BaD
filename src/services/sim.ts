@@ -8,6 +8,7 @@ import { INGREDIENT_MAP, STOCK0 } from '@/game/content/ingredients';
 import { CLASS_ORDER, GEM_ORDER } from '@/game/content/identity';
 import { fnv1a, mulberry32 } from '@/game/hash';
 import { isMainIngredient } from '@/game/pool';
+import { COPY, fill } from '@/game/content/copy';
 
 /** Cooking counts the prototype shows on its first Board; these cooks committed before the app is opened. */
 export const SEED_COUNTS: Readonly<Record<string, number>> = {
@@ -85,6 +86,8 @@ const NAMES = [
 const FIGS: readonly Figure[] = ['t1m', 't1f', 't2m', 't2f'];
 const DAY_MS = 864e5;
 const EXTRA_PICKS_PER_DAY = 160;
+/** 32 names × 10 = 320 cooks, more than the 124 seed + 160 extra picks, so every simulated cook picks at most once. */
+const ROSTER_PER_NAME = 10;
 
 interface SimCook {
   id: string;
@@ -109,38 +112,18 @@ type SimEvent =
 export interface SimState {
   counts: Record<string, number>;
   cooks: Record<string, Cook[]>;
+  /** Stock after simulated cooks, floored at 0 (the city without the player). */
   stock: Record<string, number>;
+  /** Portions simulated cooks tried to take per ingredient, not floored. */
+  drained: Record<string, number>;
   binEaten: number;
   wall: Record<string, WallEntry[]>;
   /** ms since midnight of the next event, or null when the day is exhausted. */
   nextEventAt: number | null;
 }
 
-const TONES = ['Strange', 'Suspicious', 'Chaotic', 'Questionable', 'Cursed', 'Experimental', 'Unfortunate'];
-const BASES = ['Plate', 'Bowl', 'Creation', 'Mess', 'Heap', 'Accident'];
-const DETAILS = [
-  'of unknown origin',
-  'with too much confidence',
-  'gone slightly wrong',
-  'that should not exist',
-];
-const LINES: Record<1 | 2 | 3, string[]> = {
-  3: [
-    'Fine. I have eaten worse on purpose.',
-    'Acceptable. Do not let it go to your head.',
-    'Clean plate. I have nothing to add, which annoys me.',
-  ],
-  2: [
-    'Edible. That is the whole review.',
-    'You were close. Closeness is not a flavour.',
-    'The rice is doing all the work here.',
-  ],
-  1: [
-    'I am a bin and even I have standards.',
-    'This plate lost an argument with itself.',
-    'I will eat it. I will not enjoy it. I never do.',
-  ],
-};
+const { tones: TONES, bases: BASES, details: DETAILS, prefix: PREFIX, suffix: SUFFIX } = COPY.namer;
+const LINES = COPY.lines;
 
 const pickOne = <T>(rnd: () => number, arr: readonly T[]): T => {
   const v = arr[Math.floor(rnd() * arr.length)];
@@ -161,16 +144,18 @@ function makeEntry(rnd: () => number, cook: SimCook, dishId: string, platedAt: s
   if (roll < 0.35) {
     stones = 3;
     const seared = rnd() < 0.5;
-    variant = seared ? `Seared ${lower}` : d.short;
+    variant = seared ? `${PREFIX.seared}${lower}` : d.short;
     style = 'Neat';
   } else if (roll < 0.75) {
     stones = 2;
     const missing = rnd() < 0.5;
-    variant = missing ? `${d.short}, missing something` : `Generous ${lower}`;
+    variant = missing ? `${d.short}${SUFFIX.missing}` : `${PREFIX.generous}${lower}`;
     style = missing ? 'Neat' : 'Generous';
   } else if (roll < 0.9) {
     stones = 1;
-    variant = sauce ? `${d.short}, drowning in ${sauce.name.toLowerCase()}` : `${d.short}, missing something`;
+    variant = sauce
+      ? `${d.short}${fill(SUFFIX.drowning, { sauce: sauce.name.toLowerCase() })}`
+      : `${d.short}${SUFFIX.missing}`;
     style = 'Unhinged';
   } else {
     stones = 1;
@@ -204,7 +189,7 @@ export class Simulation {
   ) {
     const rnd = mulberry32(fnv1a(`${city}|${date}`));
     this.roster = NAMES.flatMap((name, i) =>
-      Array.from({ length: 8 }, (_, k): SimCook => {
+      Array.from({ length: ROSTER_PER_NAME }, (_, k): SimCook => {
         const seed = SEED_COOKS[DISHES[k % DISHES.length]?.id ?? '']?.[i] ?? null;
         return {
           id: `sim-${i}-${k}`,
@@ -252,7 +237,7 @@ export class Simulation {
         const seed = seedCooks[i];
         const cook: SimCook = seed ? { ...takeCook(), classKey: seed[0], figure: seed[1] } : takeCook();
         // Picks are ordered so the seed avatars are the three most recent; plates spread over the first hours.
-        addPickAndPlate(cook, d.id, seed ? 3 - i : -n + i, (10 + rnd() * 600) * 6e4);
+        addPickAndPlate(cook, d.id, seed ? -i : -1000 - n + i, (10 + rnd() * 600) * 6e4);
       }
     }
     const weights = DISHES.map((d) => SEED_COUNTS[d.id] ?? 1);
@@ -273,11 +258,12 @@ export class Simulation {
     this.events = events;
   }
 
-  /** Fold every event with t ≤ msSinceMidnight. Seed picks have t ≤ 3 so they are always included. */
+  /** Fold every event with t ≤ msSinceMidnight. Seed picks have t ≤ 0 so they are always included. */
   stateAt(msSinceMidnight: number): SimState {
     const counts: Record<string, number> = {};
     const recent: Record<string, Cook[]> = {};
     const stock: Record<string, number> = { ...STOCK0 };
+    const drained: Record<string, number> = {};
     const wall: Record<string, WallEntry[]> = {};
     let binEaten = 0;
     let nextEventAt: number | null = null;
@@ -299,10 +285,13 @@ export class Simulation {
         recent[ev.dishId] = list;
       } else {
         binEaten += 1 + (ev.fling ? 1 : 0);
-        for (const [id, n] of Object.entries(ev.takes)) stock[id] = Math.max(0, (stock[id] ?? 0) - n);
+        for (const [id, n] of Object.entries(ev.takes)) {
+          stock[id] = Math.max(0, (stock[id] ?? 0) - n);
+          drained[id] = (drained[id] ?? 0) + n;
+        }
         (wall[ev.dishId] ??= []).push(ev.entry);
       }
     }
-    return { counts, cooks: recent, stock, binEaten, wall, nextEventAt };
+    return { counts, cooks: recent, stock, drained, binEaten, wall, nextEventAt };
   }
 }

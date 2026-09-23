@@ -51,7 +51,7 @@ export function Classes() {
                   gem={g}
                   size={64}
                   active={g === profile.gem}
-                  label={`${GEMS[g].name} ${cls.name}`}
+                  label={fill(COPY.a11y.gemPick, { Gem: GEMS[g].name, Class: cls.name })}
                   onClick={() => void updateProfile({ gem: g })}
                 />
               ))}

@@ -71,10 +71,47 @@ export const COPY = {
     dish: 'Dish render',
     render: 'Render',
   },
+  /** Spec §3.6 namer parts and §3.8 tier lines (used by the Phase 3 namer, and by the simulated wall today). */
+  namer: {
+    tones: ['Strange', 'Suspicious', 'Chaotic', 'Questionable', 'Cursed', 'Experimental', 'Unfortunate'],
+    bases: ['Plate', 'Bowl', 'Creation', 'Mess', 'Heap', 'Accident'],
+    details: [
+      'of unknown origin',
+      'with too much confidence',
+      'gone slightly wrong',
+      'that should not exist',
+    ],
+    prefix: { burnt: 'Burnt ', seared: 'Seared ', generous: 'Generous ' },
+    suffix: { drowning: ', drowning in {sauce}', extra: ' with {extra}', missing: ', missing something' },
+  },
+  lines: {
+    3: [
+      'Fine. I have eaten worse on purpose.',
+      'Acceptable. Do not let it go to your head.',
+      'Clean plate. I have nothing to add, which annoys me.',
+    ],
+    2: [
+      'Edible. That is the whole review.',
+      'You were close. Closeness is not a flavour.',
+      'The rice is doing all the work here.',
+    ],
+    1: [
+      'I am a bin and even I have standards.',
+      'This plate lost an argument with itself.',
+      'I will eat it. I will not enjoy it. I never do.',
+    ],
+  },
+  /** Screen-reader labels (prototype aria-labels; the spec names none). RULING */
   a11y: {
     back: "Back to today's dishes",
     remove: 'Remove one portion',
     main: 'Main',
+    intro: 'Intro',
+    cursed: 'Cursed Plates',
+    gem: '{Gem} gem',
+    gemActive: '{Gem} gem, active',
+    gemPick: '{Gem} {Class}',
+    stones: '{n} of 3 {gems}',
   },
   /** Existing OraX chrome reproduced from the prototype (not Build-A-Dish copy). RULING */
   orax: {

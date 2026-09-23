@@ -3,7 +3,7 @@ import { BuildADish } from './BuildADish';
 import { Classes } from './screens/Classes';
 import { Play } from './screens/Play';
 import { You } from './screens/You';
-import { TabBar } from './shell/TabBar';
+import { TabBar } from './components/TabBar';
 import { useGame } from './store/game';
 import { useShell } from './store/shell';
 import type { City } from './game/types';
@@ -25,20 +25,19 @@ export function App() {
   const immersive = useShell((s) => s.immersive);
   const setImmersive = useShell((s) => s.setImmersive);
   const ready = useGame((g) => g.ready);
-  const init = useGame((g) => g.init);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', params.get('theme') === 'light' ? 'light' : 'dark');
   }, [params]);
 
-  useEffect(() => {
+  // The host owns the services; the Dish tab initialises the game store from them.
+  const deps = useMemo(() => {
     const clock = createClock(clockFromSearch(window.location.search));
     const storage = createStorage();
-    const profileStore = new ProfileStore(storage, { city });
-    const service = new MockPoolService({ city, clock, storage, profile: profileStore });
-    void init({ city, service, clock, profileStore });
-    return () => useGame.getState().dispose();
-  }, [city, init]);
+    const profile = new ProfileStore(storage, { city });
+    const service = new MockPoolService({ city, clock, storage, profile });
+    return { clock, profile, service };
+  }, [city]);
 
   return (
     <div className={styles.app}>
@@ -57,7 +56,13 @@ export function App() {
           </>
         ) : null}
         <div className={styles.panel} hidden={tab !== 'dish'}>
-          <BuildADish city={city} onImmersiveChange={setImmersive} />
+          <BuildADish
+            city={city}
+            profile={deps.profile}
+            service={deps.service}
+            clock={deps.clock}
+            onImmersiveChange={setImmersive}
+          />
         </div>
       </div>
       {immersive && tab === 'dish' ? null : <TabBar tab={tab} onTab={setTab} />}

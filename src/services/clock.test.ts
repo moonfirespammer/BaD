@@ -21,7 +21,8 @@ describe('city clock (spec §3.1)', () => {
   it('counts down to 00:00 city time', () => {
     expect(resetIn(sgt('2026-09-23T21:30:00'))).toBe('02:30:00');
     expect(resetIn(sgt('2026-09-23T23:59:59'))).toBe('00:00:01');
-    expect(resetIn(sgt('2026-09-23T00:00:00'))).toBe('24:00:00');
+    expect(resetIn(sgt('2026-09-23T00:00:00'))).toBe('00:00:00');
+    expect(resetIn(sgt('2026-09-23T00:00:01'))).toBe('23:59:59');
     expect(nextResetAt(sgt('2026-09-23T21:30:00'))).toBe(sgt('2026-09-24T00:00:00'));
   });
   it('Leftovers hour is 21:00–00:00, with a dev override', () => {

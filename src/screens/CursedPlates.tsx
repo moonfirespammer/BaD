@@ -16,7 +16,7 @@ export function CursedPlates() {
   if (!profile) return null;
   const plates = profile.cursedPlates;
   return (
-    <main className={s.screen} aria-label="Cursed Plates">
+    <main className={s.screen} aria-label={COPY.a11y.cursed}>
       <div className={s.header}>
         <button
           type="button"

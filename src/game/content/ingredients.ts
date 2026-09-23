@@ -68,33 +68,37 @@ export function ingredient(id: string): Ingredient {
   return g;
 }
 
-/** Seed stock at 00:00 city time (prototype STOCK0). Both cities start from the same numbers, in separate pools. */
+/**
+ * Stock at 00:00 city time. The prototype's table was a mid-day snapshot (cucumber and roti at 0); owner decision
+ * after the Phase 1 review: every shelf starts the day above 25, so shelves run out only through play. Values the
+ * prototype had above 25 are kept. Both cities start from the same numbers, in separate pools.
+ */
 export const STOCK0: Readonly<Record<string, number>> = {
-  chicken: 22,
+  chicken: 60,
   rice: 64,
   ginger: 88,
   'chilli-sauce': 71,
-  cucumber: 0,
+  cucumber: 58,
   'dark-soy': 93,
   spaghetti: 58,
   garlic: 47,
   'olive-oil': 80,
   'chilli-flakes': 66,
-  parsley: 31,
-  parmesan: 14,
-  mutton: 36,
+  parsley: 44,
+  parmesan: 36,
+  mutton: 56,
   spices: 77,
   onion: 52,
-  coriander: 19,
+  coriander: 38,
   baguette: 41,
-  roti: 0,
+  roti: 40,
   sourdough: 63,
   'coconut-rice': 55,
-  sambal: 29,
+  sambal: 48,
   anchovies: 72,
   peanuts: 84,
-  egg: 11,
-  fish: 24,
+  egg: 40,
+  fish: 60,
   batter: 69,
   potato: 76,
   peas: 38,
@@ -103,5 +107,5 @@ export const STOCK0: Readonly<Record<string, number>> = {
   'chilli-padi': 81,
   durian: 97,
   cheddar: 74,
-  'ice-cream': 16,
+  'ice-cream': 32,
 };

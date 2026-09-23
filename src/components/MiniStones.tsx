@@ -1,3 +1,4 @@
+import { COPY, fill } from '@/game/content/copy';
 import type { Gem } from '@/game/types';
 import { GEMS } from '@/game/content/identity';
 import styles from './MiniStones.module.css';
@@ -6,7 +7,11 @@ import styles from './MiniStones.module.css';
 export function MiniStones({ gem, stones }: { gem: Gem; stones: 0 | 1 | 2 | 3 }) {
   const shape = gem === 'ruby' ? styles.round : gem === 'sapphire' ? styles.square : styles.diamond;
   return (
-    <span className={styles.row} role="img" aria-label={`${stones} of 3 ${GEMS[gem].plural}`}>
+    <span
+      className={styles.row}
+      role="img"
+      aria-label={fill(COPY.a11y.stones, { n: stones, gems: GEMS[gem].plural })}
+    >
       {[1, 2, 3].map((k) => {
         const on = k <= stones;
         return (
