@@ -55,14 +55,11 @@
   font: var(--text-caption);
   color: var(--ink-muted);
 }
-.gone .prep {
-  color: inherit;
-}
 .state {
   margin-top: auto;
   min-height: 28px;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   font: var(--text-caption);
   color: var(--ink-faint);
 }

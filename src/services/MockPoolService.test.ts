@@ -83,8 +83,11 @@ describe('MockPoolService', () => {
     expect(await service.takePortion('ginger')).toEqual({ ok: false, reason: 'cap', stock: s0 - 3 });
     expect((await service.getPlate()).items).toEqual([{ ingredientId: 'ginger', n: 3, cut: 0, heat: 0 }]);
     expect(await service.returnPortion('ginger')).toEqual({ stock: s0 - 2 });
+    const rice0 = (await service.getToday('SG')).stock.rice ?? 0;
     await service.takePortion('rice');
-    await service.returnPortion('rice');
+    // The last portion (n = 1) goes back to the shelf and the item leaves the plate.
+    expect(await service.returnPortion('rice')).toEqual({ stock: rice0 });
+    expect((await service.getToday('SG')).stock.rice).toBe(rice0);
     await service.returnPortion('rice'); // nothing held: no-op
     expect((await service.getPlate()).items).toEqual([{ ingredientId: 'ginger', n: 2, cut: 0, heat: 0 }]);
     await service.swap('nasi-lemak');

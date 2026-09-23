@@ -64,8 +64,14 @@ describe('sigil classifier (spec §3.4) — required cases', () => {
         [104, 82],
         [101, 85],
       ],
-      1,
+      2.5,
     );
+    // Every segment is at least 2px, so the stroke is ignored for its length, not for sub-2px sampling.
+    for (let i = 1; i < scribble.length; i++) {
+      const a = scribble[i - 1];
+      const b = scribble[i];
+      if (a && b) expect(Math.hypot(b.x - a.x, b.y - a.y)).toBeGreaterThanOrEqual(2);
+    }
     const len = scribble
       .slice(1)
       .reduce((a, p, i) => a + Math.hypot(p.x - (scribble[i]?.x ?? 0), p.y - (scribble[i]?.y ?? 0)), 0);
@@ -216,6 +222,27 @@ describe('sigil classifier — thresholds and order', () => {
     ); // one sharp turn ≈ 1.85 rad, straightness 0.6
     expect(classify(zig, W, 0)?.kind).toBe('cut');
     expect(classify(arc, W, 0)?.kind).toBe('cut');
+  });
+  it('turning is unsigned: a zigzag whose turns alternate left and right adds up to HEAT', () => {
+    const zigzag = path(
+      [
+        [40, 40],
+        [100, 120],
+        [160, 40],
+        [220, 120],
+        [280, 40],
+      ],
+      4,
+    ); // three sharp turns ≈ 1.85 rad each, alternating sign: |sum| ≈ 5.5 > 4.2 (a signed sum would be ≈ 1.85)
+    expect(classify(zigzag, W, 0)?.kind).toBe('heat');
+  });
+  it('a straight line downwards is a CUT, never a PLATE', () => {
+    const down = path([
+      [180, 20],
+      [180, 130],
+    ]);
+    expect(classify(down, W, 0)?.kind).toBe('cut');
+    expect(classify(down, W, 3)?.kind).toBe('cut'); // vertical: not a sweep, so no CLEAN either
   });
   it('sub-2px segments count towards length but not turning', () => {
     const jitter: StrokePoint[] = [];

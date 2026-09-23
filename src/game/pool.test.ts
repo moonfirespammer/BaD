@@ -8,7 +8,7 @@ import {
   portionsToReturn,
   stockState,
 } from './pool';
-import { STOCK0 } from './content/ingredients';
+import { EXTRAS, STOCK0 } from './content/ingredients';
 import { DISHES } from './content/dishes';
 
 describe('stock states (spec §3.3 + owner ruling Q5)', () => {
@@ -69,6 +69,11 @@ describe('dishStockState', () => {
   });
   it('every shelf starts the day above 25, so nothing reads running low or all out at 00:00', () => {
     for (const [id, n] of Object.entries(STOCK0)) expect(n, id).toBeGreaterThan(25);
+  });
+  it('extras start at twice the largest required shelf (spec §3.3: extras at 2×)', () => {
+    const required = Object.entries(STOCK0).filter(([id]) => !EXTRAS.includes(id));
+    const most = Math.max(...required.map(([, n]) => n));
+    for (const id of EXTRAS) expect(STOCK0[id], id).toBe(2 * most);
   });
 });
 

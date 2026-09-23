@@ -112,17 +112,24 @@ describe('rotating remarks and splats', () => {
     expect([0, 1, 2, 3, 4].map((n) => rotating(lines, n))).toEqual(['a', 'b', 'c', 'a', 'b']);
     expect(rotating([], 3)).toBe('');
   });
-  it('splats are deterministic, 10–22px, inside the pad margins', () => {
-    for (let i = 0; i < 50; i++) {
+  it('splats are deterministic 10–22px prototype blobs, clear of the labels and the two-line hint', () => {
+    const sizes = new Set<string>();
+    for (let i = 0; i < 200; i++) {
       const s = splat(i);
       expect(splat(i)).toEqual(s);
-      expect(s.size).toBeGreaterThanOrEqual(10);
-      expect(s.size).toBeLessThanOrEqual(22);
+      for (const d of [s.width, s.height]) {
+        expect(d).toBeGreaterThanOrEqual(10);
+        expect(d).toBeLessThanOrEqual(22);
+      }
+      sizes.add(`${s.width}x${s.height}`);
+      expect(s.radius).toBe('40% 60% 55% 45%');
       expect(s.left).toBeGreaterThanOrEqual(12);
       expect(s.left).toBeLessThanOrEqual(88);
       expect(s.top).toBeGreaterThanOrEqual(18);
-      expect(s.top).toBeLessThanOrEqual(78);
+      // The blob hangs down from its top edge: at most 60% of 150px + 22px = 112px, where the hint starts.
+      expect((s.top / 100) * 150 + s.height).toBeLessThanOrEqual(112);
     }
+    expect([...sizes].some((k) => k.split('x')[0] !== k.split('x')[1])).toBe(true); // not all square
     expect(splat(1)).not.toEqual(splat(2));
   });
 });

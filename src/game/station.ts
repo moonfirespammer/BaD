@@ -106,13 +106,19 @@ export const rotating = (lines: readonly string[], n: number): string => lines[n
 export interface Splat {
   left: number;
   top: number;
-  size: number;
+  width: number;
+  height: number;
   radius: string;
 }
 
+/** The prototype's blob shape, the same for every splat. */
+export const SPLAT_RADIUS = '40% 60% 55% 45%';
+
 /**
  * Splat i (one per mess point): deterministic position and size so the pad looks the same after a reload.
- * Spec §5: 10–22px blobs. Positions keep clear of the labels (left 12–88 %, top 18–78 %, as the prototype).
+ * Spec §5: 10–22px blobs (width and height drawn separately, as the prototype), placed by their top-left corner at
+ * left 12–88 %. Top is 18–60 % (prototype 18–78 %) so a blob never lies under the spec's two-line pad hint, which
+ * would drop that text below 4.5:1.
  */
 export function splat(i: number): Splat {
   const r = (k: number): number => {
@@ -121,12 +127,11 @@ export function splat(i: number): Splat {
     h = Math.imul(h ^ (h >>> 13), 3266489909);
     return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
   };
-  const a = Math.round(40 + r(4) * 20);
-  const b = 100 - a;
   return {
     left: 12 + r(1) * 76,
-    top: 18 + r(2) * 60,
-    size: Math.round(10 + r(3) * 12),
-    radius: `${a}% ${b}% ${b + 5}% ${a - 5}%`,
+    top: 18 + r(2) * 42,
+    width: Math.round(10 + r(3) * 12),
+    height: Math.round(10 + r(4) * 12),
+    radius: SPLAT_RADIUS,
   };
 }

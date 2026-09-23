@@ -233,7 +233,14 @@ for (const theme of THEMES) {
     for (const id of ['chicken', 'rice', 'ginger', 'ginger', 'cucumber', 'durian'])
       await tap(page, id).click();
     await chip(page, /^Poached chicken ×1/).click();
-    for (let i = 0; i < 3; i++) await draw(page, spiral(), 4);
+    // The main gestures, drawn with the real mouse, in each theme: spiral → HEAT (cooked, then burnt), flick → PLATE.
+    await draw(page, spiral(), 4);
+    await expect(word(page)).toHaveText('HEAT');
+    await expect(chip(page, /^Poached chicken ×1/)).toContainText('cooked');
+    for (let i = 0; i < 2; i++) await draw(page, spiral(), 4);
+    await expect(chip(page, /^Poached chicken ×1/)).toContainText('burnt');
+    await draw(page, flick, 3);
+    await expect(word(page)).toHaveText('PLATE');
     await page.getByRole('switch', { name: 'Prefer buttons' }).click();
     await expect(page.getByRole('button', { name: 'Heat', exact: true })).toBeVisible();
     await expectNoAxeViolations(page, `station built ${theme}`);

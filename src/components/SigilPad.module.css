@@ -34,15 +34,14 @@
   color: var(--warning);
 }
 .bottom {
-  left: var(--space-4);
-  right: var(--space-4);
+  left: 0;
+  right: 0;
   bottom: 10px;
   text-align: center;
   text-wrap: balance;
 }
 .splat {
   position: absolute;
-  transform: translate(-50%, -50%);
 }
 .word {
   position: absolute;

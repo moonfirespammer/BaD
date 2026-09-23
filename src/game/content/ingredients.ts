@@ -70,10 +70,10 @@ export function ingredient(id: string): Ingredient {
 
 /**
  * Stock at 00:00 city time. The prototype's table was a mid-day snapshot (cucumber and roti at 0); owner decision
- * after the Phase 1 review: every shelf starts the day above 25, so shelves run out only through play. Values the
- * prototype had above 25 are kept. Both cities start from the same numbers, in separate pools.
+ * after the Phase 1 review: every shelf starts the day above 25, so shelves run out only through play. Every change
+ * from the prototype's table is listed in docs/DECISIONS.md. Both cities start from the same numbers, in separate pools.
  */
-export const STOCK0: Readonly<Record<string, number>> = {
+const REQUIRED_STOCK0: Readonly<Record<string, number>> = {
   chicken: 60,
   rice: 64,
   ginger: 88,
@@ -104,8 +104,15 @@ export const STOCK0: Readonly<Record<string, number>> = {
   peas: 38,
   tartare: 57,
   lemon: 45,
-  'chilli-padi': 81,
-  durian: 97,
-  cheddar: 74,
-  'ice-cream': 32,
+};
+
+/**
+ * Spec §3.3: extras are stocked at 2× so they never run dry before Leftovers hour. The seeds differ per shelf, so
+ * each extra gets twice the largest required shelf, which is 2× under any reading.
+ */
+const EXTRA_STOCK0 = 2 * Math.max(...Object.values(REQUIRED_STOCK0));
+
+export const STOCK0: Readonly<Record<string, number>> = {
+  ...REQUIRED_STOCK0,
+  ...Object.fromEntries(EXTRAS.map((id) => [id, EXTRA_STOCK0])),
 };

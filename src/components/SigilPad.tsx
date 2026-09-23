@@ -21,6 +21,7 @@ export interface SigilPadProps {
  */
 export function SigilPad({ mess, flash, onSigil }: SigilPadProps) {
   const pts = useRef<StrokePoint[]>([]);
+  const padW = useRef(0);
   const drawing = useRef(false);
   const [trail, setTrail] = useState('');
   const [fading, setFading] = useState(false);
@@ -49,6 +50,7 @@ export function SigilPad({ mess, flash, onSigil }: SigilPadProps) {
   const down = (e: PointerEvent<HTMLDivElement>): void => {
     if (!e.isPrimary) return;
     drawing.current = true;
+    padW.current = e.currentTarget.getBoundingClientRect().width;
     pts.current = [point(e)];
     try {
       e.currentTarget.setPointerCapture(e.pointerId);
@@ -67,7 +69,8 @@ export function SigilPad({ mess, flash, onSigil }: SigilPadProps) {
   const up = (e: PointerEvent<HTMLDivElement>): void => {
     if (!drawing.current || !e.isPrimary) return;
     drawing.current = false;
-    const sigil = classify(pts.current, e.currentTarget.getBoundingClientRect().width, mess);
+    // Width as the stroke began; 358 (the pad at 390px) if the pad was not laid out, as the prototype.
+    const sigil = classify(pts.current, padW.current || 358, mess);
     setFading(true);
     fadeTimer.current = setTimeout(() => setTrail(''), TRAIL_FADE_MS + 50);
     if (sigil) onSigil(sigil);
@@ -93,7 +96,7 @@ export function SigilPad({ mess, flash, onSigil }: SigilPadProps) {
             key={i}
             slot="mess"
             id={`splat-${(i % 4) + 1}`}
-            size={s.size}
+            size={{ width: s.width, height: s.height }}
             placeholder="blob"
             blobRadius={s.radius}
             className={styles.splat}

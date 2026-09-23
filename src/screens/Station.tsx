@@ -95,20 +95,19 @@ export function Station() {
             </span>
           </div>
           {items.length === 0 ? <p className={`${s.caption} ${styles.empty}`}>{COPY.station.empty}</p> : null}
-          {items.length ? (
-            <div className={styles.chips}>
-              {items.map((i) => (
-                <PlateChip
-                  key={i.ingredientId}
-                  name={ingredient(i.ingredientId).name}
-                  n={i.n}
-                  prep={prepText(i, true)}
-                  selected={selectedIng === i.ingredientId}
-                  onSelect={() => g.selectItem(i.ingredientId)}
-                />
-              ))}
-            </div>
-          ) : null}
+          {/* The chips row is always there (empty on an empty plate), as the prototype, so the card keeps its height. */}
+          <div className={styles.chips}>
+            {items.map((i) => (
+              <PlateChip
+                key={i.ingredientId}
+                name={ingredient(i.ingredientId).name}
+                n={i.n}
+                prep={prepText(i, true)}
+                selected={selectedIng === i.ingredientId}
+                onSelect={() => g.selectItem(i.ingredientId)}
+              />
+            ))}
+          </div>
           {selectedItem ? (
             <div className={styles.applyRow}>
               <span className={s.caption}>
