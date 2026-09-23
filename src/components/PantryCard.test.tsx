@@ -45,12 +45,26 @@ describe('PantryCard (check 3)', () => {
   it('shows the ×n badge, the prep caption and a minus button only when holding portions', async () => {
     const onRemove = vi.fn();
     const { rerender } = render(<PantryCard {...props()} />);
-    expect(screen.queryByRole('button', { name: 'Remove one portion' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Remove one portion/ })).not.toBeInTheDocument();
     rerender(<PantryCard {...props({ n: 3, prep: 'cooked', onRemove, selected: true })} />);
     expect(screen.getByText('×3')).toBeInTheDocument();
     expect(screen.getByText('cooked')).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: 'Remove one portion' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Remove one portion Ginger sauce' }));
     expect(onRemove).toHaveBeenCalledTimes(1);
     expect(screen.getByTestId('pantry-ginger').className).toContain('selected');
+  });
+  it('names each minus button after its ingredient and puts the held count in the add button', () => {
+    render(<PantryCard {...props({ n: 2, prep: 'cut' })} />);
+    expect(screen.getByRole('button', { name: 'Remove one portion Ginger sauce' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Ginger sauce ×2 cut' })).toBeInTheDocument();
+  });
+  it('keeps keyboard focus on the card when minus removes the last portion', async () => {
+    const onRemove = vi.fn();
+    const { rerender } = render(<PantryCard {...props({ n: 1, onRemove })} />);
+    screen.getByRole('button', { name: 'Remove one portion Ginger sauce' }).focus();
+    await userEvent.keyboard('{Enter}');
+    expect(onRemove).toHaveBeenCalledTimes(1);
+    rerender(<PantryCard {...props({ n: 0, onRemove })} />);
+    expect(screen.getByRole('button', { name: 'Ginger sauce' })).toHaveFocus();
   });
 });

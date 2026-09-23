@@ -228,6 +228,14 @@ export class MockPoolService implements PoolService {
     });
   }
 
+  /**
+   * Plate writes need today's pick. At 00:00 the new day starts with none (spec §3.1), so a tap, stroke or fling
+   * still in flight from yesterday's Station is refused instead of leaking into the new day.
+   */
+  private picked(day: DayState): void {
+    if (!day.pick) throw new PoolError('not-picked', 'Pick a dish first');
+  }
+
   private item(day: DayState, ingredientId: string): PlateItem {
     let it = day.plate.items.find((i) => i.ingredientId === ingredientId);
     if (!it) {
@@ -239,6 +247,7 @@ export class MockPoolService implements PoolService {
 
   takePortion(ingredientId: string): Promise<TakeResult & { stock: number }> {
     return this.exclusive(async (day) => {
+      this.picked(day);
       const board = this.snapshot();
       const units = board.stock[ingredientId] ?? 0;
       const held = day.taken[ingredientId] ?? 0;
@@ -254,6 +263,7 @@ export class MockPoolService implements PoolService {
 
   returnPortion(ingredientId: string): Promise<{ stock: number }> {
     return this.exclusive(async (day) => {
+      this.picked(day);
       if ((day.taken[ingredientId] ?? 0) > 0) {
         add(day.taken, ingredientId, -1);
         const it = this.item(day, ingredientId);
@@ -269,6 +279,10 @@ export class MockPoolService implements PoolService {
   fling(ingredientId: string): Promise<void> {
     return this.exclusive(async (day) => {
       // Spec §3.4: removes the item, mess +1, city Bin-eaten counter +1. The portions are eaten, not returned.
+      this.picked(day);
+      if (!day.plate.items.some((i) => i.ingredientId === ingredientId && i.n > 0)) {
+        throw new PoolError('not-on-plate', 'Nothing to fling'); // e.g. a double tap, or minus took the last one
+      }
       const held = day.taken[ingredientId] ?? 0;
       if (held > 0) {
         add(day.taken, ingredientId, -held);
@@ -284,6 +298,7 @@ export class MockPoolService implements PoolService {
 
   saveDraft(plate: Plate): Promise<void> {
     return this.exclusive(async (day) => {
+      this.picked(day);
       const lvl = (v: number): 0 | 1 | 2 | 3 => Math.max(0, Math.min(3, Math.round(v))) as 0 | 1 | 2 | 3;
       const client = new Map(plate.items.map((i) => [i.ingredientId, i]));
       // Portions (n) stay as the pool counted them; the client owns prep, flair and mess.

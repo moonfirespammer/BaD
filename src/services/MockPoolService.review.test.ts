@@ -62,13 +62,9 @@ describe('MockPoolService review fixes', () => {
     slow.release();
     expect((await board).date).toBe('2026-09-24');
     expect(await pick).toBeNull();
-    expect(await take).toMatchObject({ ok: true });
-    const today = slow.inner.dump()['bad:day:SG:2026-09-24'] as {
-      pick: unknown;
-      taken: Record<string, number>;
-    };
-    expect(today.pick).toBeNull();
-    expect(today.taken).toEqual({ ginger: 1 });
+    // Today has no pick yet, so the take is refused (Phase 2 review) rather than landing on today's pool.
+    await expect(take).rejects.toMatchObject({ code: 'not-picked' });
+    expect(slow.inner.dump()['bad:day:SG:2026-09-24']).toBeUndefined();
     const yesterday = slow.inner.dump()['bad:day:SG:2026-09-23'] as { taken: Record<string, number> };
     expect(yesterday.taken).toEqual({ ginger: 1 });
   });
@@ -134,5 +130,49 @@ describe('MockPoolService review fixes', () => {
     const late = await service.getToday('SG');
     const states = new Set(Object.entries(late.stock).map(([id, n]) => stockState(n, id)));
     expect(states.size).toBeGreaterThanOrEqual(2);
+  });
+});
+
+// Regression tests for the Phase 2 review findings (day rollover, double fling).
+describe('MockPoolService plate writes (Phase 2 review)', () => {
+  it('refuses every plate write when the day has no pick, e.g. the moment after 00:00', async () => {
+    const { service, advance } = await setup('2026-09-23T23:59:58');
+    await service.pick('chicken-rice');
+    await service.takePortion('chicken');
+    await service.saveDraft({
+      items: [{ ingredientId: 'chicken', n: 1, cut: 1, heat: 0 }],
+      flair: 3,
+      mess: 1,
+    });
+    advance(2500); // 00:00:00.5 — the new day starts with no pick
+    const writes = [
+      () => service.takePortion('ginger'),
+      () => service.returnPortion('chicken'),
+      () => service.fling('chicken'),
+      () =>
+        service.saveDraft({ items: [{ ingredientId: 'chicken', n: 1, cut: 2, heat: 0 }], flair: 4, mess: 1 }),
+    ];
+    for (const w of writes) {
+      await expect(w()).rejects.toMatchObject({ code: 'not-picked' });
+    }
+    expect(await service.getPick()).toBeNull();
+    expect(await service.getPlate()).toEqual({ items: [], flair: 0, mess: 0 });
+    await service.pick('nasi-lemak');
+    expect(await service.getPlate()).toEqual({ items: [], flair: 0, mess: 0 });
+  });
+
+  it('refuses a fling of an ingredient that is not on the plate (double tap, or minus took the last one)', async () => {
+    const { service } = await setup('2026-09-23T10:00:00');
+    await service.pick('chicken-rice');
+    await service.takePortion('ginger');
+    const bin0 = (await service.getToday('SG')).binEaten;
+    const both = await Promise.allSettled([service.fling('ginger'), service.fling('ginger')]);
+    expect(both.map((r) => r.status)).toEqual(['fulfilled', 'rejected']);
+    expect(both[1]).toMatchObject({ reason: new PoolError('not-on-plate', 'Nothing to fling') });
+    await service.takePortion('rice');
+    await service.returnPortion('rice');
+    await expect(service.fling('rice')).rejects.toMatchObject({ code: 'not-on-plate' });
+    expect((await service.getPlate()).mess).toBe(1);
+    expect((await service.getToday('SG')).binEaten).toBe(bin0 + 1);
   });
 });

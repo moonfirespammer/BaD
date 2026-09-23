@@ -59,9 +59,43 @@ let tick: ReturnType<typeof setInterval> | null = null;
 /** Bumped by every init and dispose; an init that finds a newer generation after its awaits gives up. */
 let generation = 0;
 
+/** True while a fling is in flight, so a double tap flings once. */
+let flinging = false;
+
 /** A refused action (already picked, no swaps left, ...) is a no-op for the player; anything else is a bug. */
 function ignorePoolError(e: unknown): void {
   if (!(e instanceof PoolError)) throw e;
+}
+
+/** Day rollover: the pool, pick and plate reset together (spec §3.1), so reload all three from the service. */
+async function resyncDay(): Promise<void> {
+  const { deps } = useGame.getState();
+  if (!deps) return;
+  const mine = generation;
+  const [board, pick, plate] = await Promise.all([
+    deps.service.getToday(deps.city),
+    deps.service.getPick(),
+    deps.service.getPlate(),
+  ]);
+  if (mine === generation) {
+    useGame.setState({ board, pick, plate, selectedDish: pick?.dishId ?? null, selectedIng: null });
+  }
+}
+
+/**
+ * Run a Station write. A refusal resolves to null; a refusal for want of a pick means the day rolled over, so the
+ * Station catches up at once. A result that lands after the rollover is dropped: yesterday's plate is gone.
+ */
+async function write<T>(run: () => Promise<T>): Promise<T | null> {
+  const day = useGame.getState().board?.date;
+  try {
+    const r = await run();
+    return useGame.getState().board?.date === day ? r : null;
+  } catch (e) {
+    ignorePoolError(e);
+    if (e instanceof PoolError && e.code === 'not-picked') await resyncDay();
+    return null;
+  }
 }
 
 export const useGame = create<GameState>((set, get) => ({
@@ -101,13 +135,8 @@ export const useGame = create<GameState>((set, get) => ({
     });
     unsubscribe = deps.service.subscribe(deps.city, (b) => {
       const prev = get().board;
-      // Day rollover: the pool, pick and plate reset together (spec §3.1).
       if (prev && prev.date !== b.date) {
-        void Promise.all([deps.service.getPick(), deps.service.getPlate()]).then(([p, pl]) => {
-          if (mine === generation) {
-            set({ board: b, pick: p, plate: pl, selectedDish: p?.dishId ?? null, selectedIng: null });
-          }
-        });
+        void resyncDay();
         return;
       }
       set({ board: b });
@@ -117,6 +146,7 @@ export const useGame = create<GameState>((set, get) => ({
   },
   dispose: () => {
     generation += 1;
+    flinging = false;
     unsubscribe?.();
     unsubscribeProfile?.();
     if (tick) clearInterval(tick);
@@ -159,7 +189,8 @@ export const useGame = create<GameState>((set, get) => ({
     if (!deps) return;
     // Every Pantry tap selects the ingredient, including refused and Gone taps (prototype behaviour).
     set({ selectedIng: ingredientId });
-    const r = await deps.service.takePortion(ingredientId);
+    const r = await write(() => deps.service.takePortion(ingredientId));
+    if (!r) return;
     if (!r.ok) {
       if (r.reason === 'gone') remark(fill(COPY.bin.gone, { City: CITY_NAME[deps.city] }));
       else {
@@ -183,7 +214,7 @@ export const useGame = create<GameState>((set, get) => ({
   removeIngredient: async (ingredientId) => {
     const { deps } = get();
     if (!deps || !get().plate.items.some((i) => i.ingredientId === ingredientId && i.n > 0)) return;
-    await deps.service.returnPortion(ingredientId);
+    if (!(await write(() => deps.service.returnPortion(ingredientId)))) return;
     set((s) => ({
       plate: {
         ...s.plate,
@@ -200,18 +231,24 @@ export const useGame = create<GameState>((set, get) => ({
     const o = applySigil(plate, selectedIng, kind, fast);
     set({ plate: o.plate, flash: { word: o.word, seq: (flash?.seq ?? 0) + 1 } });
     if (o.remark) remark(o.remark);
-    await deps.service.saveDraft(o.plate);
-    if (o.plateNow) await get().plateNow();
+    const saved = await write(() => deps.service.saveDraft(o.plate).then(() => true));
+    if (saved && o.plateNow) await get().plateNow();
   },
   fling: async () => {
     const { deps, plate, selectedIng } = get();
-    if (!deps || !selectedIng || !plate.items.some((i) => i.ingredientId === selectedIng && i.n > 0)) return;
-    await deps.service.fling(selectedIng);
-    const n = get().flings;
-    const next = flingItem(get().plate, selectedIng);
-    set({ plate: next, selectedIng: null, flings: n + 1 });
-    remark(rotating(COPY.bin.fling, n));
-    await deps.service.saveDraft(next);
+    if (flinging || !deps || !selectedIng) return;
+    if (!plate.items.some((i) => i.ingredientId === selectedIng && i.n > 0)) return;
+    flinging = true;
+    try {
+      if (!(await write(() => deps.service.fling(selectedIng).then(() => true)))) return;
+      const n = get().flings;
+      const next = flingItem(get().plate, selectedIng);
+      set({ plate: next, selectedIng: null, flings: n + 1 });
+      remark(rotating(COPY.bin.fling, n));
+      await write(() => deps.service.saveDraft(next));
+    } finally {
+      flinging = false;
+    }
   },
   plateNow: async () => {
     const { deps, plate } = get();

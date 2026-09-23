@@ -28,6 +28,9 @@
 .topRight {
   top: 10px;
   right: 14px;
+  /* Clear of `SIGIL PAD` on narrow phones: wraps to two right-aligned lines instead of overprinting. */
+  max-width: calc(100% - 120px);
+  text-align: right;
   color: var(--warning);
 }
 .bottom {
@@ -52,6 +55,8 @@
   text-transform: uppercase;
   color: var(--brand-text);
   pointer-events: none;
+}
+.wordIn {
   animation: sigil-in var(--motion-fast) var(--ease-standard);
 }
 .trail {

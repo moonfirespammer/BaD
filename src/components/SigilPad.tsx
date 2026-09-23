@@ -45,7 +45,9 @@ export function SigilPad({ mess, flash, onSigil }: SigilPadProps) {
     const r = e.currentTarget.getBoundingClientRect();
     return { x: e.clientX - r.left, y: e.clientY - r.top, t: e.timeStamp };
   };
+  // One finger draws: a second finger (a pinch, a resting thumb) is not the primary pointer and is ignored.
   const down = (e: PointerEvent<HTMLDivElement>): void => {
+    if (!e.isPrimary) return;
     drawing.current = true;
     pts.current = [point(e)];
     try {
@@ -58,12 +60,12 @@ export function SigilPad({ mess, flash, onSigil }: SigilPadProps) {
     setTrail(strokePath(pts.current));
   };
   const move = (e: PointerEvent<HTMLDivElement>): void => {
-    if (!drawing.current) return;
+    if (!drawing.current || !e.isPrimary) return;
     pts.current.push(point(e));
     setTrail(strokePath(pts.current));
   };
   const up = (e: PointerEvent<HTMLDivElement>): void => {
-    if (!drawing.current) return;
+    if (!drawing.current || !e.isPrimary) return;
     drawing.current = false;
     const sigil = classify(pts.current, e.currentTarget.getBoundingClientRect().width, mess);
     setFading(true);
@@ -99,11 +101,14 @@ export function SigilPad({ mess, flash, onSigil }: SigilPadProps) {
           />
         );
       })}
-      {word ? (
-        <span key={word.seq} className={styles.word} data-testid="sigil-word">
-          {word.word}
-        </span>
-      ) : null}
+      {/* Always mounted, so screen readers announce each flashed word (it is the only feedback for a good stroke). */}
+      <div className={styles.word} aria-live="polite">
+        {word ? (
+          <span key={word.seq} className={styles.wordIn} data-testid="sigil-word">
+            {word.word}
+          </span>
+        ) : null}
+      </div>
       <svg className={styles.trail} aria-hidden="true">
         <path d={trail} className={fading ? styles.fading : undefined} />
       </svg>

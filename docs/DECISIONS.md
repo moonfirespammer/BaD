@@ -1,7 +1,8 @@
 # Build-A-Dish — decisions log
 
 Precedence when building: **owner rulings below** › `BUILD-A-DISH.md` (spec) › `CLAUDE_CODE_PROMPT.md` › prototype.
-Each later phase adds its rulings here.
+Each later phase adds its rulings here. A bare `Qn` in the Phase 1 sections is an owner ruling; from Phase 2 on,
+owner rulings are cited as "ruling Qn" and items of the questions register as "register Qn" (the numberings collide).
 
 ## Owner rulings — Phase 1 questions (23 Sep 2026)
 
@@ -51,6 +52,7 @@ Leftovers hour lifts the cap above 25 (plenty and moderate), per spec §3.3.
 | `PoolService` | `saveDraft(plate)` (Phase 2) | The in-progress plate's prep, flair and mess survive a reload; portions stay server-owned. |
 | `Profile` | `preferButtons?: boolean` (Phase 2) | Spec §10 "Prefer buttons" setting (Cut and Heat buttons under the pad). |
 | `<Art>` | `placeholder: 'box' \| 'blob'` (Phase 2) | Mess splats go through Art (slot `mess`, `splat-1…4`) with the spec's blob as the stand-in. |
+| `PoolError` | code `'not-on-plate'` (Phase 2 review) | A fling of an ingredient no longer on the plate (double tap) is refused instead of adding mess. |
 
 ## Stack deviations
 
@@ -68,8 +70,8 @@ Leftovers hour lifts the cap above 25 (plenty and moderate), per spec §3.3.
 
 These follow the questions register's literal readings; each is listed in the Phase 2 report for the owner.
 
-- **Header**: dish name with ellipsis; caption is the local name (Mutton soup → "Sup kambing", Q1) since cuisine tags are hidden (Q10); countdown reads `RESETS hh:mm:ss` (spec §3.1).
-- **Pantry state words**: spec §2/§5 — only `Running low` and `Gone` show on Pantry cards (the Board's four stock words, Q5, apply to the Board only). `Running low` is never shortened to the prototype's "Low".
+- **Header**: dish name with ellipsis; caption is the local name (Mutton soup → "Sup kambing", ruling Q1) since cuisine tags are hidden (ruling Q10); countdown reads `RESETS hh:mm:ss` (spec §3.1).
+- **Pantry state words**: spec §2/§5 — only `Running low` and `Gone` show on Pantry cards (the Board's four stock words, ruling Q5, apply to the Board only). `Running low` is never shortened to the prototype's "Low".
 - **Cap refusal**: the three lines rotate per session (1st, 2nd, 3rd refusal …); the prototype indexed by portion count and never rotated.
 - **Fling remark**: rotates per fling; flung portions are eaten (Phase 1 fix). Fling adds mess (spec) and therefore a splat (one splat per mess point).
 - **Taps**: every Pantry tap selects the ingredient, including refused and Gone taps (prototype).
@@ -79,3 +81,13 @@ These follow the questions register's literal readings; each is listed in the Ph
 - **Prefer buttons**: a switch directly under the sigil pad reveals `Cut` and `Heat`; persisted on the profile. No wipe button (mess is an optional toy, spec §2).
 - **Accessibility**: a Gone card's state caption sits inside its `aria-disabled` add button (an inactive control, exempt from the 4.5:1 text rule), keeping the spec's `--ink-faint`. The empty-plate caption uses `--ink-muted` (the spec gives no colour). `Fling to the Bin` has a 44px hit target (prototype 36px).
 - **Pad hint**: the spec's `SLASH TO CUT · SPIRAL TO HEAT · FLICK UP TO PLATE` wraps to two centred lines (the prototype shortened it to one).
+
+## Phase 2 review fixes (23 Sep 2026)
+
+- **Midnight**: plate writes (take, return, fling, draft) need today's pick, so a tap, stroke or fling in the moment after 00:00 is refused and the Station goes straight back to the Board with a clean day (spec §3.1). A result that lands after the rollover is dropped.
+- **Double taps**: a second `Fling to the Bin` while the first is in flight does nothing; the service refuses a fling of an item no longer on the plate.
+- **One finger draws**: the sigil pad follows the primary pointer only, so a pinch or a second finger never cooks anything. The classifier is unchanged.
+- **Screen readers**: the flashed sigil word sits in a polite live region; each minus button is named after its ingredient ("Remove one portion Ginger sauce"); a Pantry add button includes the held count (the `×n` badge moved inside it, same place on screen); keyboard focus stays on the plate card after a fling and on the card after minus removes the last portion.
+- **Narrow phones**: `MESS ×n · SWEEP TO WIPE` wraps to two right-aligned lines instead of overprinting `SIGIL PAD` below about 360px (visual deviation; the spec's target is 390px).
+- **Kept as the prototype has it** (reviewed, not changed): the shared header measures 61px (the prototype's 56px is a min-height); Pantry names use the prototype's 20px leading; below 360px some names break mid-word and `Running low` touches the minus button.
+

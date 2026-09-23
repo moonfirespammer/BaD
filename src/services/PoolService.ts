@@ -47,7 +47,7 @@ export class NotImplementedError extends Error {
 
 export class PoolError extends Error {
   constructor(
-    public readonly code: 'already-picked' | 'no-swaps' | 'not-picked' | 'same-dish',
+    public readonly code: 'already-picked' | 'no-swaps' | 'not-picked' | 'not-on-plate' | 'same-dish',
     message: string,
   ) {
     super(message);

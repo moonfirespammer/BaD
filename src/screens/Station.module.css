@@ -23,6 +23,13 @@
 .plate {
   padding: var(--space-3) var(--space-4);
 }
+.plate:focus {
+  outline: none;
+}
+.plate:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
 .plateHead {
   display: flex;
   align-items: center;

@@ -11,7 +11,9 @@ async function toStation(page: Page, dish = 'Hainanese chicken rice', short = 'c
 }
 
 const tap = (page: Page, id: string) => page.getByTestId(`pantry-${id}`).getByRole('button').first();
-const chip = (page: Page, name: RegExp) => page.getByRole('button', { name });
+/** A plate chip. Pantry add buttons carry the same `{Ingredient} ×n`, so look only inside the plate card. */
+const chip = (page: Page, name: RegExp) =>
+  page.getByRole('region', { name: 'YOUR PLATE' }).getByRole('button', { name });
 
 /** Draw on the sigil pad with the real mouse: points are fractions of the pad. */
 async function draw(page: Page, pts: [number, number][], msPerStep = 8): Promise<void> {
@@ -71,7 +73,10 @@ test.describe('Phase 2: Station', () => {
     await expect(chip(page, /^Ginger sauce ×3/)).toBeVisible();
     await tap(page, 'ginger').click();
     await expect(toast(page)).toContainText('Three is plenty. Come back at leftovers hour.');
-    await page.getByTestId('pantry-ginger').getByRole('button', { name: 'Remove one portion' }).click();
+    await page
+      .getByTestId('pantry-ginger')
+      .getByRole('button', { name: 'Remove one portion Ginger sauce' })
+      .click();
     await expect(chip(page, /^Ginger sauce ×2/)).toBeVisible();
 
     await draw(page, slash); // nothing selected yet? ginger is selected by the taps: cut applies to ginger
@@ -153,6 +158,18 @@ test.describe('Phase 2: Station', () => {
     await page.getByRole('button', { name: 'Cut', exact: true }).focus();
     await page.keyboard.press('Enter');
     await expect(chip(page, /^Poached chicken ×1/)).toContainText('cut · cooked');
+    await expect(page.getByTestId('sigil-pad').locator('[aria-live="polite"]')).toHaveText('CUT'); // announced
+    // Flinging, or removing the last portion, unmounts the focused button: focus stays in place, not on <body>.
+    await tap(page, 'ginger').focus();
+    await page.keyboard.press('Enter');
+    await page.getByRole('button', { name: 'Fling to the Bin' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByRole('region', { name: 'YOUR PLATE' })).toBeFocused();
+    await tap(page, 'rice').focus();
+    await page.keyboard.press('Enter');
+    await page.getByRole('button', { name: /^Remove one portion Chicken rice/ }).focus();
+    await page.keyboard.press('Enter');
+    await expect(tap(page, 'rice')).toBeFocused();
     await page.getByRole('button', { name: 'Plate it' }).focus();
     await page.keyboard.press('Enter');
     await expect(word(page)).toHaveText('PLATE');

@@ -183,3 +183,83 @@ describe('Station store actions', () => {
     });
   });
 });
+
+// Regression tests for the Phase 2 review findings: the midnight window (spec §3.1) and the double fling.
+describe('Station store at the day rollover and under double taps', () => {
+  afterEach(() => {
+    useToast.getState().clear();
+    g().dispose();
+    vi.useRealTimers();
+  });
+
+  /** Boot at 23:59:58 with a cooked plate; the service's 1 s emit timer is held so the rollover is not yet seen. */
+  async function bootBeforeMidnight() {
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
+    let now = sgt('2026-09-23T23:59:58');
+    const storage = createMemoryStorage();
+    const clock = createClock({ source: () => now });
+    const profileStore = new ProfileStore(storage, { city: 'SG' });
+    const service = new MockPoolService({ city: 'SG', clock, storage, profile: profileStore });
+    await g().init({ city: 'SG', service, clock, profileStore });
+    g().selectDish('chicken-rice');
+    await g().pickSelected();
+    await g().tapIngredient('chicken');
+    await g().stroke('cut', true);
+    await g().tapIngredient('rice');
+    await g().fling();
+    await g().tapIngredient('ginger');
+    expect(g().plate).toMatchObject({ flair: 1, mess: 1 });
+    now = sgt('2026-09-24T00:00:00') + 300;
+    return { service, storage, clock, profileStore };
+  }
+
+  it.each([
+    ['a Pantry tap', () => g().tapIngredient('durian')],
+    ['a stroke', () => g().stroke('cut', true)],
+    ['a fling', () => g().fling()],
+    ['a minus', () => g().removeIngredient('ginger')],
+  ])(
+    '%s in the moment after 00:00 leaks nothing into the new day and sends the Station back to the Board',
+    async (_, act) => {
+      const { service, storage, clock, profileStore } = await bootBeforeMidnight();
+      await act();
+      expect(g().board?.date).toBe('2026-09-24');
+      expect(g().pick).toBeNull(); // the Station redirects to the Board
+      expect(g().plate).toEqual({ items: [], flair: 0, mess: 0 });
+      expect(g().selectedIng).toBeNull();
+      // A reload sees a clean day, and a fresh pick starts from an empty plate.
+      const reloaded = new MockPoolService({ city: 'SG', clock, storage, profile: profileStore });
+      expect(await reloaded.getPlate()).toEqual({ items: [], flair: 0, mess: 0 });
+      await service.pick('nasi-lemak');
+      expect(await service.getPlate()).toEqual({ items: [], flair: 0, mess: 0 });
+    },
+  );
+
+  it('drops a take that lands after the rollover instead of adding it to the new day', async () => {
+    const deps = await boot();
+    const take = deps.service.takePortion.bind(deps.service);
+    vi.spyOn(deps.service, 'takePortion').mockImplementationOnce(async (id) => {
+      const r = await take(id);
+      const board = g().board;
+      if (board)
+        useGame.setState({
+          board: { ...board, date: '2026-09-24' },
+          plate: { items: [], flair: 0, mess: 0 },
+        });
+      return r;
+    });
+    await g().tapIngredient('ginger');
+    expect(g().plate.items).toEqual([]);
+  });
+
+  it('a double tap on Fling to the Bin flings once', async () => {
+    await boot();
+    const { remarks, off } = listen();
+    await g().tapIngredient('ginger');
+    await Promise.all([g().fling(), g().fling()]);
+    off();
+    expect(g().plate).toMatchObject({ items: [], mess: 1 });
+    expect(g().flings).toBe(1);
+    expect(remarks).toEqual(['Rude. Delicious, but rude.']);
+  });
+});

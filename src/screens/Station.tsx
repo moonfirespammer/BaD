@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { Navigate, useNavigate } from 'react-router';
 import { Button } from '@/components/Button';
 import { Icon } from '@/components/Icon';
@@ -24,6 +25,7 @@ export function Station() {
   const flash = useGame((g) => g.flash);
   const preferButtons = useGame((g) => g.profile?.preferButtons ?? false);
   useGame((g) => g.now); // re-render every second for the countdown
+  const plateCard = useRef<HTMLElement>(null);
   const g = useGame.getState();
   if (!board || !deps) return null;
   if (!pick) return <Navigate to="/board" replace />;
@@ -80,7 +82,12 @@ export function Station() {
           </div>
         ) : null}
 
-        <section className={`${s.card} ${styles.plate}`} aria-label={COPY.station.plate}>
+        <section
+          ref={plateCard}
+          tabIndex={-1}
+          className={`${s.card} ${styles.plate}`}
+          aria-label={COPY.station.plate}
+        >
           <div className={styles.plateHead}>
             <span className={s.overline}>{COPY.station.plate}</span>
             <span className={`${s.pixel} ${styles.plateLabel}`}>
@@ -109,7 +116,15 @@ export function Station() {
                 <strong className={styles.applyName}>{ingredient(selectedItem.ingredientId).name}</strong>
                 {applyPost}
               </span>
-              <button type="button" className={styles.fling} onClick={() => void g.fling()}>
+              <button
+                type="button"
+                className={styles.fling}
+                onClick={(e) => {
+                  // Flinging unmounts this button: keep a keyboard user's place on the plate (detail 0 = key press).
+                  if (e.detail === 0) plateCard.current?.focus();
+                  void g.fling();
+                }}
+              >
                 {COPY.station.fling}
               </button>
             </div>

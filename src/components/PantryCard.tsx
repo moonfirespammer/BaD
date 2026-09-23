@@ -1,3 +1,4 @@
+import { useId, useRef, type MouseEvent } from 'react';
 import { COPY, fill } from '@/game/content/copy';
 import { stockState } from '@/game/pool';
 import { Icon } from './Icon';
@@ -38,13 +39,32 @@ export function PantryCard({
     .filter(Boolean)
     .join(' ');
   const state = st === 'low' ? COPY.station.runningLow : gone ? COPY.station.gone : '';
+  const add = useRef<HTMLButtonElement>(null);
+  const nameId = useId();
+  const minusId = useId();
+  const remove = (e: MouseEvent<HTMLButtonElement>): void => {
+    // The last portion unmounts the minus button: keep a keyboard user's place on this card (detail 0 = key press).
+    if (n === 1 && e.detail === 0) add.current?.focus();
+    onRemove();
+  };
   return (
     <div className={cls} data-testid={`pantry-${ingredientId}`} data-state={st}>
-      {/* One control carries name, prep and state, so a Gone card reads "Cucumber, Gone" and, being an inactive
-          control (aria-disabled), is exempt from text contrast (WCAG 1.4.3) while keeping the spec's faint ink. */}
-      <button type="button" className={styles.add} onClick={onAdd} aria-disabled={gone || undefined}>
-        <span className={styles.name}>{name}</span>
-        {prep ? <span className={styles.prep}>{prep}</span> : null}
+      {/* One control carries name, count, prep and state, so a Gone card reads "Cucumber, Gone" and, being an
+          inactive control (aria-disabled), is exempt from text contrast (WCAG 1.4.3) while keeping the spec's faint
+          ink. The ×n badge sits inside it (absolutely placed on the card) so the held count is in its name. */}
+      <button
+        ref={add}
+        type="button"
+        className={styles.add}
+        onClick={onAdd}
+        aria-disabled={gone || undefined}
+      >
+        <span className={styles.name} id={nameId}>
+          {name}
+        </span>
+        {/* Spaces between the parts keep the accessible name readable ("Ginger sauce ×2 cut"); flex ignores them. */}{' '}
+        {n > 0 ? <span className={styles.badge}>{fill(COPY.station.badge, { n })}</span> : null}{' '}
+        {prep ? <span className={styles.prep}>{prep}</span> : null}{' '}
         <span
           className={`${styles.state} ${st === 'low' ? styles.low : ''} ${n > 0 ? styles.roomForMinus : ''}`}
         >
@@ -52,16 +72,18 @@ export function PantryCard({
         </span>
       </button>
       {n > 0 ? (
-        <button type="button" className={styles.minus} aria-label={COPY.a11y.remove} onClick={onRemove}>
+        <button
+          type="button"
+          id={minusId}
+          className={styles.minus}
+          aria-label={COPY.a11y.remove}
+          aria-labelledby={`${minusId} ${nameId}`}
+          onClick={remove}
+        >
           <span className={styles.minusBox}>
             <Icon name="minus" size={16} />
           </span>
         </button>
-      ) : null}
-      {n > 0 ? (
-        <span className={styles.badge} aria-hidden="true">
-          {fill(COPY.station.badge, { n })}
-        </span>
       ) : null}
     </div>
   );
