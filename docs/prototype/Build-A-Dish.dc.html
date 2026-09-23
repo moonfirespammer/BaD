@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/orax-design-system-d465f658-44e2-4d20-8f69-4eb374b02b90/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/orax-design-system-d465f658-44e2-4d20-8f69-4eb374b02b90/tokens/colors.css">
+<link rel="stylesheet" href="_ds/orax-design-system-d465f658-44e2-4d20-8f69-4eb374b02b90/tokens/typography.css">
+<link rel="stylesheet" href="_ds/orax-design-system-d465f658-44e2-4d20-8f69-4eb374b02b90/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/orax-design-system-d465f658-44e2-4d20-8f69-4eb374b02b90/tokens/effects.css">
+<link rel="stylesheet" href="_ds/orax-design-system-d465f658-44e2-4d20-8f69-4eb374b02b90/tokens/base.css">
+<link rel="stylesheet" href="_ds/orax-design-system-d465f658-44e2-4d20-8f69-4eb374b02b90/styles.css">
+<script>window.ORAX_ASSET_BASE='orax/';</script>
+<script src="_ds/orax-design-system-d465f658-44e2-4d20-8f69-4eb374b02b90/_ds_bundle.js"></script>
+<script src="./image-slot.js"></script>
+<style>
+body{margin:0;background:var(--surface);color:var(--ink);font-family:var(--font-sans)}
+a{color:var(--brand-text);text-decoration:none}a:hover{color:var(--brand-text);text-decoration:underline;text-underline-offset:2px}
+@keyframes bad-toast{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes bad-sigil{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</helmet>
+<div style="display:flex;flex-wrap:wrap;gap:var(--space-6);align-items:flex-start;justify-content:center;padding:var(--space-6) var(--space-5);max-width:1180px;margin:0 auto;box-sizing:border-box;font-family:var(--font-sans);color:var(--ink)">
+  <aside style="flex:1 1 300px;max-width:380px;display:flex;flex-direction:column;gap:var(--space-4)">
+    <p style="margin:0;font:var(--text-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--ink-muted)">Build-A-Dish · design notes · 23 Sep 2026</p>
+    <h1 style="margin:0;font:var(--text-heading-md);letter-spacing:var(--tracking-heading-md)">Five dishes. One shelf. One Bin.</h1>
+    <p style="margin:0;font:var(--text-body);color:var(--ink-muted)">A daily, city-shared cooking minigame in a fourth OraX tab. Everyone in Singapore or Kuala Lumpur cooks from the same Pantry. You commit to one dish a day, build it by tapping portions and stroking three loose sigils, and the Bin judges the plate in your own gem.</p>
+    <section style="background:var(--surface-raised);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-2)">
+      <p style="margin:0;font:var(--text-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--ink-muted)">Kept from the docs</p>
+      <ul style="margin:0;padding-left:18px;font:var(--text-caption);color:var(--ink);display:flex;flex-direction:column;gap:4px">
+        <li>The Bin as judge, centre stage. Dry, judgemental, the payoff beat of every plate.</li>
+        <li>Always produce something: no fail state, procedural cursed names, a Cursed Plates gallery.</li>
+        <li>Roles, states and dish families drive recognition and naming.</li>
+        <li>The ingredient book becomes the shared Pantry.</li>
+        <li>Sigils, reduced to three gesture families: slash cuts, spiral heats, flick plates.</li>
+        <li>Signature Dish on the profile. Mess and wipe survive as an optional toy.</li>
+      </ul>
+    </section>
+    <section style="background:var(--surface-raised);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-2)">
+      <p style="margin:0;font:var(--text-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--ink-muted)">Cut or parked</p>
+      <ul style="margin:0;padding-left:18px;font:var(--text-caption);color:var(--ink);display:flex;flex-direction:column;gap:4px">
+        <li>Unity 2.5D room, physics, soft landing, slingshot disposal. Web-native 2D instead.</li>
+        <li>Wand and Culinary Focus: flavour text only.</li>
+        <li>QTE timing bars, drag-and-drop plating, three class origin stories.</li>
+      </ul>
+    </section>
+    <section style="background:var(--surface-raised);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-2)">
+      <p style="margin:0;font:var(--text-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--ink-muted)">New in this pass</p>
+      <ul style="margin:0;padding-left:18px;font:var(--text-caption);color:var(--ink);display:flex;flex-direction:column;gap:4px">
+        <li>Today's dishes: five, Asian and Western, with live cooking counts and avatars.</li>
+        <li>City Pantry with Running low and Gone states. Soft cap of three portions.</li>
+        <li>Leftovers hour, 21:00 to midnight city time: caps lift on anything still plentiful. Ten portions of ginger sauce, legally.</li>
+        <li>Same-dish wall sorted by the Bin's rating, most cursed at the bottom, plus a same-dish thread.</li>
+        <li>Share card: dish, verdict, class avatar, gem, stones, city and date.</li>
+      </ul>
+    </section>
+    <section style="background:var(--surface-raised);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-2)">
+      <p style="margin:0;font:var(--text-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--ink-muted)">Assumptions</p>
+      <ul style="margin:0;padding-left:18px;font:var(--text-caption);color:var(--ink);display:flex;flex-direction:column;gap:4px">
+        <li>Stones are a hidden 0 to 100 score shown in your gem: 75 and up is three, 45 and up is two. Cursed means under 35, two extras, or two burnt items.</li>
+        <li>Habit tags come from repeated behaviour: doubling the chilli, raw rice, unhinged portions.</li>
+        <li>Art is placeholders. Drop the Bin and dish renders into the slots.</li>
+        <li>The countdown runs on the real UTC+8 clock. Force Leftovers hour from Tweaks.</li>
+      </ul>
+    </section>
+    <p style="margin:0;font:var(--text-caption);color:var(--ink-muted)">Try: Dish tab, pick chicken rice, tap ginger sauce four times, spiral over the chicken three times, flick up. Then open Cursed Plates.</p>
+    <p style="margin:0;font:var(--text-caption);color:var(--ink-muted)">Next: real Bin and dish art, stroke tuning on device, a backend for the pool and counts, thread moderation.</p>
+  </aside>
+  <div style="flex:none;display:flex;flex-direction:column;gap:var(--space-4);align-items:center">
+    <div data-theme="{{ theme }}" data-screen-label="{{ screen }}" style="width:390px;height:844px;flex:none;display:flex;flex-direction:column;background:var(--surface);color:var(--ink);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;position:relative;font-family:var(--font-sans)">
+      <div style="flex:1;min-height:0;position:relative;display:flex;flex-direction:column">
+
+        <sc-if value="{{ isIntro }}" hint-placeholder-val="{{ true }}">
+          <div data-screen-label="Intro" style="display:flex;flex-direction:column;height:100%;padding:var(--space-4);box-sizing:border-box;gap:var(--space-5)">
+            <div style="display:flex;align-items:center;justify-content:space-between;min-height:44px">
+              <x-import component-from-global-scope="OraXDesignSystem_d465f6.Logo" height="{{ 32 }}" hint-size="40px,32px"></x-import>
+              <span style="font:var(--text-pixel-label);letter-spacing:var(--tracking-pixel-label);text-transform:uppercase;color:var(--ink-muted)">Build-a-dish</span>
+            </div>
+            <sc-if value="{{ intro1 }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:var(--space-5);flex:1">
+                <div style="height:220px;position:relative"><image-slot id="bad-intro-1" shape="rounded" radius="12" placeholder="Illustration: the city shelf"></image-slot></div>
+                <h2 style="margin:0;font:var(--text-display-lg);letter-spacing:var(--tracking-display-lg);text-wrap:pretty">Five dishes a day. One shelf for the whole city.</h2>
+                <p style="margin:0;font:var(--text-body-lg);color:var(--ink-muted);text-wrap:pretty">Everyone in {{ city }} cooks from the same Pantry. When the ginger sauce runs out, it is out.</p>
+              </div>
+            </sc-if>
+            <sc-if value="{{ intro2 }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:var(--space-5);flex:1">
+                <div style="height:220px;position:relative"><image-slot id="bad-intro-2" shape="rounded" radius="12" placeholder="Illustration: three sigils"></image-slot></div>
+                <h2 style="margin:0;font:var(--text-display-lg);letter-spacing:var(--tracking-display-lg);text-wrap:pretty">Tap to add a portion. Stroke to cook.</h2>
+                <p style="margin:0;font:var(--text-body-lg);color:var(--ink-muted);text-wrap:pretty">Slash to cut. Spiral to heat. Flick up to plate. Nothing you draw can fail.</p>
+              </div>
+            </sc-if>
+            <sc-if value="{{ intro3 }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:var(--space-5);flex:1">
+                <div style="height:220px;position:relative"><image-slot id="bad-intro-3" shape="rounded" radius="12" placeholder="Illustration: the Bin"></image-slot></div>
+                <h2 style="margin:0;font:var(--text-display-lg);letter-spacing:var(--tracking-display-lg);text-wrap:pretty">The Bin judges everything.</h2>
+                <p style="margin:0;font:var(--text-body-lg);color:var(--ink-muted);text-wrap:pretty">Dry, hungry, never wrong. Even a disaster gets a name, a rating in your gem and a place on the wall.</p>
+              </div>
+            </sc-if>
+            <div style="display:flex;justify-content:center;gap:var(--space-2)">
+              <sc-for list="{{ introDots }}" as="d" hint-placeholder-count="3"><span style="{{ d.style }}"></span></sc-for>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-2)">
+              <x-import component-from-global-scope="OraXDesignSystem_d465f6.Button" block="{{ true }}" on-click="{{ nextIntro }}" hint-size="100%,44px">{{ introCta }}</x-import>
+              <x-import component-from-global-scope="OraXDesignSystem_d465f6.Button" variant="ghost" block="{{ true }}" on-click="{{ skipIntro }}" hint-size="100%,44px">Skip</x-import>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isBoard }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="Today's dishes" style="display:flex;flex-direction:column;height:100%">
+            <div style="flex:1;min-height:0;overflow:auto;padding:0 var(--space-4) var(--space-4);box-sizing:border-box">
+              <header style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-3) 0;min-height:56px;box-sizing:border-box">
+                <x-import component-from-global-scope="OraXDesignSystem_d465f6.Logo" height="{{ 32 }}" hint-size="40px,32px"></x-import>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+                  <span style="font:var(--text-pixel-label);letter-spacing:var(--tracking-pixel-label);text-transform:uppercase;color:var(--ink)">Resets {{ resetIn }}</span>
+                  <span style="font:var(--text-pixel-label);letter-spacing:var(--tracking-pixel-label);text-transform:uppercase;color:var(--ink-muted)">{{ cityUpper }}</span>
+                </div>
+              </header>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);padding:var(--space-3) 0 0">
+                <h1 style="margin:0;font:var(--text-heading-md);letter-spacing:var(--tracking-heading-md)">Today's dishes</h1>
+                <button type="button" onClick="{{ goGallery }}" style="min-height:44px;padding:0 var(--space-2);background:transparent;border:0;border-radius:var(--radius-md);color:var(--brand-text);font:var(--text-body-strong);cursor:pointer;white-space:nowrap">Cursed Plates · {{ cursedCount }}</button>
+              </div>
+              <p style="margin:var(--space-1) 0 var(--space-4);font:var(--text-caption);color:var(--ink-muted)">One shelf for all of {{ city }}. One dish a day, swap once.</p>
+              <sc-if value="{{ leftovers }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:2px;border:1px dashed var(--border-strong);border-radius:var(--radius-sm);padding:var(--space-2) var(--space-3);margin-bottom:var(--space-3)">
+                  <span style="font:var(--text-pixel-label);letter-spacing:var(--tracking-pixel-label);text-transform:uppercase;color:var(--brand-text)">Leftovers hour · until 00:00</span>
+                  <span style="font:var(--text-caption);color:var(--ink-muted)">Portion caps are off on anything the city still has plenty of.</span>
+                </div>
+              </sc-if>
+              <sc-if value="{{ hasPicked }}" hint-placeholder-val="{{ false }}">
+                <p style="margin:0 0 var(--space-3);font:var(--text-body-strong);color:var(--brand-text)">You are in. {{ pickedCooking }} cooking {{ pickedShortLower }} right now.</p>
+              </sc-if>
+              <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+                <sc-for list="{{ dishes }}" as="d" hint-placeholder-count="5">
+                  <button type="button" onClick="{{ d.pick }}" aria-pressed="{{ d.selected }}" style="{{ d.cardStyle }}">
+                    <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:flex-start">
+                      <div style="flex:1;min-width:0">
+                        <div style="font:var(--text-heading-sm);letter-spacing:var(--tracking-heading-sm)">{{ d.name }}</div>
+                        <div style="font:var(--text-caption);color:var(--ink-muted);margin-top:2px">{{ d.cuisineText }}</div>
+                      </div>
+                      <sc-if value="{{ d.picked }}" hint-placeholder-val="{{ false }}">
+                        <x-import component-from-global-scope="OraXDesignSystem_d465f6.Chip" hint-size="auto,26px">Cooking today</x-import>
+                      </sc-if>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-3);margin-top:var(--space-3)">
+                      <div style="font:var(--text-caption);color:var(--ink-muted);flex:1;min-width:0">{{ d.meta }}</div>
+                      <div style="display:flex;align-items:center;gap:var(--space-2);flex:none">
+                        <div style="display:flex;padding-left:6px">
+                          <sc-for list="{{ d.avatars }}" as="a" hint-placeholder-count="3"><span aria-hidden="true" style="{{ a.style }}"></span></sc-for>
+                        </div>
+                        <span style="font:var(--text-body-strong)">{{ d.cooking }}</span>
+                        <span style="font:var(--text-caption);color:var(--ink-muted)">cooking</span>
+                      </div>
+                    </div>
+                  </button>
+                </sc-for>
+              </div>
+              <p style="margin:var(--space-5) 0 0;text-align:center;font:var(--text-caption);color:var(--ink-muted)">The Bin has eaten {{ binEatenText }} plates in {{ city }} today.</p>
+            </div>
+            <div style="flex:none;padding:var(--space-3) var(--space-4) var(--space-4);border-top:1px solid var(--border)">
+              <x-import component-from-global-scope="OraXDesignSystem_d465f6.Button" block="{{ true }}" disabled="{{ boardDisabled }}" on-click="{{ boardAction }}" hint-size="100%,44px">{{ boardCta }}</x-import>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isStation }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="Station" style="display:flex;flex-direction:column;height:100%">
+            <div style="display:flex;align-items:center;gap:var(--space-1);padding:var(--space-2) var(--space-4) var(--space-2) var(--space-1);border-bottom:1px solid var(--border);flex:none;min-height:56px;box-sizing:border-box">
+              <button type="button" aria-label="Back to today's dishes" onClick="{{ goBoard }}" style="width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:0;border-radius:var(--radius-md);color:var(--ink);cursor:pointer;padding:0"><x-import component-from-global-scope="OraXDesignSystem_d465f6.Icon" name="arrow-left" size="{{ 24 }}" hint-size="24px,24px"></x-import></button>
+              <div style="flex:1;min-width:0">
+                <div style="font:var(--text-heading-sm);letter-spacing:var(--tracking-heading-sm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ pickedName }}</div>
+                <div style="font:var(--text-caption);color:var(--ink-muted)">{{ pickedCuisine }}</div>
+              </div>
+              <span style="font:var(--text-pixel-label);letter-spacing:var(--tracking-pixel-label);text-transform:uppercase;color:var(--ink-muted);white-space:nowrap">{{ resetIn }}</span>
+            </div>
+            <div style="flex:1;min-height:0;overflow:auto;padding:var(--space-3) var(--space-4) var(--space-4);box-sizing:border-box;display:flex;flex-direction:column;gap:var(--space-3)">
+              <sc-if value="{{ leftovers }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:2px;border:1px dashed var(--border-strong);border-radius:var(--radius-sm);padding:var(--space-2) var(--space-3)">
+                  <span style="font:var(--text-pixel-label);letter-spacing:var(--tracking-pixel-label);text-transform:uppercase;color:var(--brand-text)">Leftovers hour · until 00:00</span>
+                  <span style="font:var(--text-caption);color:var(--ink-muted)">No cap on anything the city still has plenty of.</span>
+                </div>
+              </sc-if>
+              <section style="background:var(--surface-raised);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4)">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-2)">
+                  <span style="font:var(--text-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--ink-muted)">Your plate</span>
+                  <span style="font:var(--text-pixel-label);letter-spacing:var(--tracking-pixel-label);text-transform:uppercase;color:var(--ink)">{{ portionStyle }} · Flair ×{{ flair }}</span>
+                </div>
+                <sc-if value="{{ plateEmpty }}" hint-placeholder-val="{{ true }}">
+                  <p style="margin:var(--space-2) 0 0;font:var(--text-caption);color:var(--ink-faint)">Nothing yet. Tap the Pantry to add a portion.</p>
+                </sc-if>
+                <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);margin-top:var(--space-2)">
+                  <sc-for list="{{ plateItems }}" as="p" hint-placeholder-count="0">
+                    <button type="button" onClick="{{ p.select }}" style="{{ p.style }}"><span style="font:var(--text-body-strong)">{{ p.label }}</span><span style="font:var(--text-caption);color:var(--ink-muted)">{{ p.prep }}</span></button>
+                  </sc-for>
+                </div>
+                <sc-if value="{{ hasSelected }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-2);margin-top:var(--space-2)">
+                    <span style="font:var(--text-caption);color:var(--ink-muted)">Strokes apply to <strong style="color:var(--ink);font-weight:500">{{ selectedName }}</strong></span>
+                    <button type="button" onClick="{{ fling }}" style="min-height:36px;padding:0 var(--space-2);background:transparent;border:0;border-radius:var(--radius-sm);color:var(--brand-text);font:var(--text-caption);font-weight:500;cursor:pointer;white-space:nowrap">Fling to the Bin</button>
+                  </div>
+                </sc-if>
+              </section>
+              <div onPointerDown="{{ padDown }}" onPointerMove="{{ padMove }}" onPointerUp="{{ padUp }}" onPointerCancel="{{ padUp }}" style="position:relative;height:150px;flex:none;border-radius:var(--radius-lg);background:var(--surface-sunken);box-shadow:var(--shadow-socket), 0 0 0 1px var(--border);touch-action:none;user-select:none;cursor:crosshair;overflow:hidden">
+                <span style="position:absolute;top:10px;left:14px;font:var(--text-pixel-label);letter-spacing:var(--tracking-pixel-label);text-transform:uppercase;color:var(--ink-muted)">Sigil pad</span>
+                <sc-if value="{{ hasMess }}" hint-placeholder-val="{{ false }}">
+                  <span style="position:absolute;top:10px;right:14px;font:var(--text-pixel-label);letter-spacing:var(--tracking-pixel-label);text-transform:uppercase;color:var(--warning)">Mess ×{{ mess }} · sweep to wipe</span>
+                </sc-if>
+                <sc-for list="{{ splats }}" as="s" hint-placeholder-count="0"><span aria-hidden="true" style="{{ s.style }}"></span></sc-for>
+                <sc-if value="{{ hasSigil }}" hint-placeholder-val="{{ false }}">
+                  <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:var(--text-tagline);letter-spacing:var(--tracking-tagline);text-transform:uppercase;color:var(--brand-text);animation:bad-sigil 120ms var(--ease-standard);pointer-events:none">{{ sigil }}</span>
+                </sc-if>
+                <svg aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"><path d="{{ strokePath }}" fill="none" stroke="var(--brand-text)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" style="{{ strokeStyle }}"></path></svg>
+                <span style="position:absolute;left:0;right:0;bottom:10px;text-align:center;font:var(--text-pixel-label);letter-spacing:var(--tracking-pixel-label);text-transform:uppercase;color:var(--ink-muted);pointer-events:none">Slash cut · Spiral heat · Flick plate</span>
+              </div>
+              <section>
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-2)">
+                  <span style="font:var(--text-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--ink-muted)">Pantry · {{ cityUpper }}</span>
+                  <span style="font:var(--text-caption);color:var(--ink-muted);text-align:right">{{ capText }}</span>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:var(--space-2);margin-top:var(--space-2)">
+                  <sc-for list="{{ pantryMain }}" as="i" hint-placeholder-count="6">
+                    <div style="{{ i.cardStyle }}">
+                      <button type="button" onClick="{{ i.add }}" style="flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:2px;background:transparent;border:0;padding:0;color:inherit;text-align:left;cursor:pointer;min-height:44px;width:100%;font:inherit">
+                        <span style="font:var(--text-body-strong);line-height:20px">{{ i.name }}</span>
+                        <span style="font:var(--text-caption);color:var(--ink-muted)">{{ i.prep }}</span>
+                      </button>
+                      <div style="display:flex;align-items:center;justify-content:space-between;gap:4px;min-height:28px">
+                        <span style="{{ i.stateStyle }}">{{ i.stateText }}</span>
+                        <sc-if value="{{ i.canRemove }}" hint-placeholder-val="{{ false }}">
+                          <button type="button" aria-label="Remove one portion" onClick="{{ i.remove }}" style="flex:none;width:44px;height:44px;margin:-8px -14px -10px 0;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:0;color:var(--ink);cursor:pointer;padding:0"><span style="width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface-raised)"><x-import component-from-global-scope="OraXDesignSystem_d465f6.Icon" name="minus" size="{{ 16 }}" hint-size="16px,16px"></x-import></span></button>
+                        </sc-if>
+                      </div>
+                      <sc-if value="{{ i.badge }}" hint-placeholder-val="{{ false }}">
+                        <span style="position:absolute;top:-8px;right:-8px;min-width:24px;height:24px;padding:0 6px;box-sizing:border-box;border-radius:var(--radius-full);background:var(--brand);color:var(--on-brand);font:var(--text-caption);font-weight:700;display:flex;align-items:center;justify-content:center">×{{ i.n }}</span>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+                <sc-if value="{{ hasOptional }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top:var(--space-4);font:var(--text-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--ink-muted)">Bread · optional</div>
+                  <div style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:var(--space-2);margin-top:var(--space-2)">
+                    <sc-for list="{{ pantryOptional }}" as="i" hint-placeholder-count="3">
+                      <div style="{{ i.cardStyle }}">
+                        <button type="button" onClick="{{ i.add }}" style="flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:2px;background:transparent;border:0;padding:0;color:inherit;text-align:left;cursor:pointer;min-height:44px;width:100%;font:inherit">
+                          <span style="font:var(--text-body-strong);line-height:20px">{{ i.name }}</span>
+                          <span style="font:var(--text-caption);color:var(--ink-muted)">{{ i.prep }}</span>
+                        </button>
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:4px;min-height:28px">
+                          <span style="{{ i.stateStyle }}">{{ i.stateText }}</span>
+                          <sc-if value="{{ i.canRemove }}" hint-placeholder-val="{{ false }}">
+                            <button type="button" aria-label="Remove one portion" onClick="{{ i.remove }}" style="flex:none;width:44px;height:44px;margin:-8px -14px -10px 0;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:0;color:var(--ink);cursor:pointer;padding:0"><span style="width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface-raised)"><x-import component-from-global-scope="OraXDesignSystem_d465f6.Icon" name="minus" size="{{ 16 }}" hint-size="16px,16px"></x-import></span></button>
+                          </sc-if>
+                        </div>
+                        <sc-if value="{{ i.badge }}" hint-placeholder-val="{{ false }}">
+                          <span style="position:absolute;top:-8px;right:-8px;min-width:24px;height:24px;padding:0 6px;box-sizing:border-box;border-radius:var(--radius-full);background:var(--brand);color:var(--on-brand);font:var(--text-caption);font-weight:700;display:flex;align-items:center;justify-content:center">×{{ i.n }}</span>
+                        </sc-if>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+                <div style="margin-top:var(--space-4);font:var(--text-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--ink-muted)">Pantry extras</div>
+                <p style="margin:2px 0 0;font:var(--text-caption);color:var(--ink-muted)">Shared across all five dishes. Use responsibly, or do not.</p>
+                <div style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:var(--space-2);margin-top:var(--space-2)">
+                  <sc-for list="{{ extras }}" as="i" hint-placeholder-count="4">
+                    <div style="{{ i.cardStyle }}">
+                      <button type="button" onClick="{{ i.add }}" style="flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:2px;background:transparent;border:0;padding:0;color:inherit;text-align:left;cursor:pointer;min-height:44px;width:100%;font:inherit">
+                        <span style="font:var(--text-body-strong);line-height:20px">{{ i.name }}</span>
+                        <span style="font:var(--text-caption);color:var(--ink-muted)">{{ i.prep }}</span>
+                      </button>
+                      <div style="display:flex;align-items:center;justify-content:space-between;gap:4px;min-height:28px">
+                        <span style="{{ i.stateStyle }}">{{ i.stateText }}</span>
+                        <sc-if value="{{ i.canRemove }}" hint-placeholder-val="{{ false }}">
+                          <button type="button" aria-label="Remove one portion" onClick="{{ i.remove }}" style="flex:none;width:44px;height:44px;margin:-8px -14px -10px 0;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:0;color:var(--ink);cursor:pointer;padding:0"><span style="width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface-raised)"><x-import component-from-global-scope="OraXDesignSystem_d465f6.Icon" name="minus" size="{{ 16 }}" hint-size="16px,16px"></x-import></span></button>
+                        </sc-if>
+                      </div>
+                      <sc-if value="{{ i.badge }}" hint-placeholder-val="{{ false }}">
+                        <span style="position:absolute;top:-8px;right:-8px;min-width:24px;height:24px;padding:0 6px;box-sizing:border-box;border-radius:var(--radius-full);background:var(--brand);color:var(--on-brand);font:var(--text-caption);font-weight:700;display:flex;align-items:center;justify-content:center">×{{ i.n }}</span>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </section>
+            </div>
+            <div style="flex:none;padding:var(--space-3) var(--space-4) var(--space-3);border-top:1px solid var(--border)">
+              <x-import component-from-global-scope="OraXDesignSystem_d465f6.Button" block="{{ true }}" on-click="{{ plateNow }}" hint-size="100%,44px">Plate it</x-import>
+              <p style="margin:var(--space-1) 0 0;text-align:center;font:var(--text-caption);color:var(--ink-muted)">or flick up on the sigil pad</p>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isVerdict }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="Verdict" style="display:flex;flex-direction:column;height:100%">
+            <div style="display:flex;align-items:center;gap:var(--space-1);padding:var(--space-2) var(--space-4) var(--space-2) var(--space-1);border-bottom:1px solid var(--border);flex:none;min-height:56px;box-sizing:border-box">
+              <button type="button" aria-label="Back to today's dishes" onClick="{{ goBoard }}" style="width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:0;border-radius:var(--radius-md);color:var(--ink);cursor:pointer;padding:0"><x-import component-from-global-scope="OraXDesignSystem_d465f6.Icon" name="x" size="{{ 24 }}" hint-size="24px,24px"></x-import></button>
+              <div style="flex:1;font:var(--text-heading-sm);letter-spacing:var(--tracking-heading-sm)">The Bin's verdict</div>
+              <span style="font:var(--text-pixel-label);letter-spacing:var(--tracking-pixel-label);text-transform:uppercase;color:var(--ink-muted)">{{ resetIn }}</span>
+            </div>
+            <div style="flex:1;min-height:0;overflow:auto;padding:var(--space-4);box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:var(--space-4)">
+              <div style="width:140px;height:140px;flex:none"><image-slot id="bad-bin" shape="circle" placeholder="The Bin, character art" style="width:140px;height:140px"></image-slot></div>
+              <section style="width:100%;box-sizing:border-box;background:var(--surface-raised);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-4)">
+                <span style="font:var(--text-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--ink-muted)">The Bin</span>
+                <p style="margin:var(--space-1) 0 0;font:var(--text-body-lg);text-wrap:pretty">{{ verdict.line }}</p>
+                <sc-if value="{{ verdict.waste }}" hint-placeholder-val="{{ false }}">
+                  <p style="margin:var(--space-2) 0 0;font:var(--text-caption);color:var(--ink-muted)">Something below said thank you. That is not normal.</p>
+                </sc-if>
+              </section>
+              <div style="text-align:center;width:100%">
+                <sc-if value="{{ verdict.cursed }}" hint-placeholder-val="{{ false }}">
+                  <div style="font:var(--text-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--gem-ruby-text);margin-bottom:var(--space-1)">Cursed plate · {{ verdict.hint }}</div>
+                </sc-if>
+                <h2 style="margin:0;font:var(--text-heading-md);letter-spacing:var(--tracking-heading-md);text-wrap:pretty">{{ verdict.name }}</h2>
+                <p style="margin:var(--space-1) 0 0;font:var(--text-body-strong)">{{ verdict.label }}</p>
+                <p style="margin:var(--space-1) 0 0;font:var(--text-caption);color:var(--ink-muted);text-wrap:pretty">{{ verdict.summary }}</p>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:var(--space-2)">
+                <div style="display:flex;gap:var(--space-3);align-items:center">
+                  <sc-for list="{{ stones }}" as="st" hint-placeholder-count="3">
+                    <x-import component-from-global-scope="OraXDesignSystem_d465f6.GemSocket" gem="{{ playerGem }}" active="{{ st.on }}" size="{{ 56 }}" hint-size="56px,56px"></x-import>
+                  </sc-for>
+                </div>
+                <span style="font:var(--text-caption);color:var(--ink-muted)">{{ stonesText }}</span>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:var(--space-2)">
+                <x-import component-from-global-scope="OraXDesignSystem_d465f6.Chip" appearance="subtle" hint-size="auto,26px">{{ verdict.style }}</x-import>
+                <x-import component-from-global-scope="OraXDesignSystem_d465f6.Chip" appearance="subtle" hint-size="auto,26px">{{ verdict.habit }}</x-import>
+                <sc-if value="{{ verdict.leftoversUsed }}" hint-placeholder-val="{{ false }}">
+                  <x-import component-from-global-scope="OraXDesignSystem_d465f6.Chip" appearance="subtle" hint-size="auto,26px">Leftovers hour</x-import>
+                </sc-if>
+                <sc-if value="{{ verdict.cursed }}" hint-placeholder-val="{{ false }}">
+                  <x-import component-from-global-scope="OraXDesignSystem_d465f6.Chip" variant="ruby" appearance="outline" hint-size="auto,26px">Cursed plate</x-import>
+                </sc-if>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:var(--space-2);width:100%;margin-top:auto">
+                <x-import component-from-global-scope="OraXDesignSystem_d465f6.Button" block="{{ true }}" on-click="{{ goShare }}" hint-size="100%,44px">Share to your party</x-import>
+                <x-import component-from-global-scope="OraXDesignSystem_d465f6.Button" variant="secondary" block="{{ true }}" disabled="{{ isSignature }}" on-click="{{ setSignature }}" hint-size="100%,44px">{{ signatureCta }}</x-import>
+                <x-import component-from-global-scope="OraXDesignSystem_d465f6.Button" variant="ghost" block="{{ true }}" on-click="{{ goWall }}" hint-size="100%,44px">See who else made {{ verdictDishLower }}</x-import>
+              </div>
+              <p style="margin:0;text-align:center;font:var(--text-caption);color:var(--ink-muted)">The Bin has eaten {{ binEatenText }} plates in {{ city }} today.</p>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isWall }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="Same-dish wall" style="display:flex;flex-direction:column;height:100%">
+            <div style="display:flex;align-items:center;gap:var(--space-1);padding:var(--space-2) var(--space-4) var(--space-2) var(--space-1);border-bottom:1px solid var(--border);flex:none;min-height:56px;box-sizing:border-box">
+              <button type="button" aria-label="Back" onClick="{{ wallBack }}" style="width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:0;border-radius:var(--radius-md);color:var(--ink);cursor:pointer;padding:0"><x-import component-from-global-scope="OraXDesignSystem_d465f6.Icon" name="arrow-left" size="{{ 24 }}" hint-size="24px,24px"></x-import></button>
+              <div style="flex:1;min-width:0">
+                <div style="font:var(--text-heading-sm);letter-spacing:var(--tracking-heading-sm)">{{ wallTitle }}</div>
+                <div style="font:var(--text-caption);color:var(--ink-muted)">Sorted by the Bin's rating. Most cursed at the bottom.</div>
+              </div>
+            </div>
+            <div style="flex:1;min-height:0;overflow:auto;padding:var(--space-3) var(--space-4) var(--space-4);box-sizing:border-box;display:flex;flex-direction:column;gap:var(--space-2)">
+              <sc-for list="{{ wallRows }}" as="r" hint-placeholder-count="6">
+                <div style="{{ r.rowStyle }}">
+                  <span aria-hidden="true" style="{{ r.avatar }}"></span>
+                  <div style="flex:1;min-width:0">
+                    <div style="display:flex;align-items:baseline;gap:var(--space-2)">
+                      <span style="font:var(--text-body-strong)">{{ r.name }}</span>
+                      <span style="{{ r.clsStyle }}">{{ r.clsName }}</span>
+                    </div>
+                    <div style="font:var(--text-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.variant }}</div>
+                    <div style="font:var(--text-caption);color:var(--ink-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.style }} · {{ r.line }}</div>
+                  </div>
+                  <div style="display:flex;gap:6px;flex:none;padding:0 2px">
+                    <sc-for list="{{ r.minis }}" as="m" hint-placeholder-count="3">
+                      <span style="{{ m.style }}"><span aria-hidden="true" style="{{ m.imgStyle }}"></span></span>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="flex:none;padding:var(--space-3) var(--space-4) var(--space-4);border-top:1px solid var(--border)">
+              <x-import component-from-global-scope="OraXDesignSystem_d465f6.Button" variant="secondary" block="{{ true }}" on-click="{{ goThread }}" hint-size="100%,44px">Open the {{ wallShortLower }} thread · 12</x-import>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isThread }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="Same-dish thread" style="display:flex;flex-direction:column;height:100%">
+            <div style="display:flex;align-items:center;gap:var(--space-1);padding:var(--space-2) var(--space-4) var(--space-2) var(--space-1);border-bottom:1px solid var(--border);flex:none;min-height:56px;box-sizing:border-box">
+              <button type="button" aria-label="Back to the wall" onClick="{{ goWall }}" style="width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:0;border-radius:var(--radius-md);color:var(--ink);cursor:pointer;padding:0"><x-import component-from-global-scope="OraXDesignSystem_d465f6.Icon" name="arrow-left" size="{{ 24 }}" hint-size="24px,24px"></x-import></button>
+              <div style="flex:1;min-width:0">
+                <div style="font:var(--text-heading-sm);letter-spacing:var(--tracking-heading-sm)">{{ wallShort }} thread</div>
+                <div style="font:var(--text-caption);color:var(--ink-muted)">Today only. Resets with the Pantry.</div>
+              </div>
+            </div>
+            <div style="flex:1;min-height:0;overflow:auto;padding:var(--space-4);box-sizing:border-box;display:flex;flex-direction:column;gap:var(--space-4)">
+              <sc-for list="{{ thread }}" as="m" hint-placeholder-count="3">
+                <div style="display:flex;gap:var(--space-3);align-items:flex-start">
+                  <span aria-hidden="true" style="{{ m.avatar }}"></span>
+                  <div style="flex:1;min-width:0">
+                    <div style="display:flex;align-items:baseline;gap:var(--space-2)"><span style="font:var(--text-body-strong)">{{ m.name }}</span><span style="font:var(--text-caption);color:var(--ink-muted)">{{ m.time }}</span></div>
+                    <p style="margin:2px 0 0;font:var(--text-body);text-wrap:pretty">{{ m.text }}</p>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="flex:none;display:flex;gap:var(--space-2);align-items:center;padding:var(--space-3) var(--space-4) var(--space-4);border-top:1px solid var(--border)">
+              <div style="flex:1;min-height:44px;box-sizing:border-box;display:flex;align-items:center;padding:0 var(--space-3);border-radius:var(--radius-sm);background:var(--surface-sunken);box-shadow:var(--shadow-socket);border:1px solid var(--border-strong);font:var(--text-body);color:var(--ink-faint)">Say something to the {{ wallShortLower }} table</div>
+              <button type="button" aria-label="Send" style="width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;background:var(--brand);border:0;border-radius:var(--radius-md);color:var(--on-brand);cursor:pointer;padding:0"><x-import component-from-global-scope="OraXDesignSystem_d465f6.Icon" name="send" size="{{ 20 }}" hint-size="20px,20px"></x-import></button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isGallery }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="Cursed Plates" style="display:flex;flex-direction:column;height:100%">
+            <div style="display:flex;align-items:center;gap:var(--space-1);padding:var(--space-2) var(--space-4) var(--space-2) var(--space-1);border-bottom:1px solid var(--border);flex:none;min-height:56px;box-sizing:border-box">
+              <button type="button" aria-label="Back to today's dishes" onClick="{{ goBoard }}" style="width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:0;border-radius:var(--radius-md);color:var(--ink);cursor:pointer;padding:0"><x-import component-from-global-scope="OraXDesignSystem_d465f6.Icon" name="arrow-left" size="{{ 24 }}" hint-size="24px,24px"></x-import></button>
+              <div style="flex:1;min-width:0">
+                <div style="font:var(--text-heading-sm);letter-spacing:var(--tracking-heading-sm)">Cursed Plates · {{ cursedCount }}</div>
+                <div style="font:var(--text-caption);color:var(--ink-muted)">Everything the Bin refused to forget.</div>
+              </div>
+            </div>
+            <div style="flex:1;min-height:0;overflow:auto;padding:var(--space-4);box-sizing:border-box">
+              <div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:var(--space-3)">
+                <sc-for list="{{ gallery }}" as="g" hint-placeholder-count="2">
+                  <div style="display:flex;flex-direction:column;gap:var(--space-2);background:var(--surface-raised);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-3);box-sizing:border-box">
+                    <div style="height:96px;border-radius:var(--radius-sm);background:var(--surface-sunken);border:1px dashed var(--border-strong);display:flex;align-items:center;justify-content:center;font:var(--text-caption);color:var(--ink-faint)">Render</div>
+                    <div style="font:var(--text-body-strong);text-wrap:pretty">{{ g.name }}</div>
+                    <div style="font:var(--text-caption);color:var(--ink-muted)">{{ g.hint }} · {{ g.date }}</div>
+                    <div style="font:var(--text-caption);color:var(--ink-muted);text-wrap:pretty">{{ g.line }}</div>
+                    <div style="display:flex;gap:6px;padding:2px">
+                      <sc-for list="{{ g.minis }}" as="m" hint-placeholder-count="3">
+                        <span style="{{ m.style }}"><span aria-hidden="true" style="{{ m.imgStyle }}"></span></span>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isShare }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="Share card" style="display:flex;flex-direction:column;height:100%">
+            <div style="display:flex;align-items:center;gap:var(--space-1);padding:var(--space-2) var(--space-4) var(--space-2) var(--space-1);border-bottom:1px solid var(--border);flex:none;min-height:56px;box-sizing:border-box">
+              <button type="button" aria-label="Back to the verdict" onClick="{{ goVerdict }}" style="width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:0;border-radius:var(--radius-md);color:var(--ink);cursor:pointer;padding:0"><x-import component-from-global-scope="OraXDesignSystem_d465f6.Icon" name="arrow-left" size="{{ 24 }}" hint-size="24px,24px"></x-import></button>
+              <div style="flex:1;font:var(--text-heading-sm);letter-spacing:var(--tracking-heading-sm)">Share card</div>
+            </div>
+            <div style="flex:1;min-height:0;overflow:auto;padding:var(--space-4);box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center">
+              <div style="width:326px;box-sizing:border-box;background:var(--surface-raised);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-5);display:flex;flex-direction:column;gap:var(--space-3)">
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <x-import component-from-global-scope="OraXDesignSystem_d465f6.Logo" height="{{ 32 }}" hint-size="40px,32px"></x-import>
+                  <span style="font:var(--text-pixel-label);letter-spacing:var(--tracking-pixel-label);text-transform:uppercase;color:var(--ink-muted)">Build-a-dish</span>
+                </div>
+                <span style="font:var(--text-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--ink-muted)">{{ cityUpper }} · {{ dateText }}</span>
+                <h2 style="margin:0;font:var(--text-heading-md);letter-spacing:var(--tracking-heading-md);text-wrap:pretty">{{ verdict.name }}</h2>
+                <p style="margin:0;font:var(--text-body);color:var(--ink-muted);text-wrap:pretty">{{ verdict.line }}</p>
+                <div style="display:flex;gap:var(--space-2);align-items:center">
+                  <sc-for list="{{ stones }}" as="st" hint-placeholder-count="3">
+                    <x-import component-from-global-scope="OraXDesignSystem_d465f6.GemSocket" gem="{{ playerGem }}" active="{{ st.on }}" size="{{ 44 }}" hint-size="44px,44px"></x-import>
+                  </sc-for>
+                </div>
+                <div style="display:flex;align-items:center;gap:var(--space-3);padding-top:var(--space-2);border-top:1px solid var(--border)">
+                  <span aria-hidden="true" style="{{ meAvatar44 }}"></span>
+                  <div style="flex:1;min-width:0">
+                    <div style="font:var(--text-body-strong)">Ayu</div>
+                    <div style="{{ meClassStyle }}">{{ playerClassName }}</div>
+                  </div>
+                  <x-import component-from-global-scope="OraXDesignSystem_d465f6.Chip" variant="{{ playerGem }}" hint-size="auto,26px"></x-import>
+                </div>
+                <x-import component-from-global-scope="OraXDesignSystem_d465f6.Tagline" size="md" hint-size="100%,44px"></x-import>
+              </div>
+            </div>
+            <div style="flex:none;display:flex;flex-direction:column;gap:var(--space-2);padding:var(--space-3) var(--space-4) var(--space-4);border-top:1px solid var(--border)">
+              <x-import component-from-global-scope="OraXDesignSystem_d465f6.Button" block="{{ true }}" disabled="{{ sent }}" on-click="{{ share }}" hint-size="100%,44px">{{ shareCta }}</x-import>
+              <x-import component-from-global-scope="OraXDesignSystem_d465f6.Button" variant="secondary" block="{{ true }}" on-click="{{ saveImage }}" hint-size="100%,44px">Save image</x-import>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isPlay }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="Play" style="display:flex;flex-direction:column;height:100%;overflow:auto;padding-bottom:var(--space-4)">
+            <header style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-3) var(--space-4)">
+              <x-import component-from-global-scope="OraXDesignSystem_d465f6.Logo" height="{{ 32 }}" hint-size="40px,32px"></x-import>
+              <button type="button" aria-label="Notifications" style="width:44px;height:44px;margin-right:-10px;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:0;border-radius:var(--radius-md);color:var(--ink);cursor:pointer;padding:0"><x-import component-from-global-scope="OraXDesignSystem_d465f6.Icon" name="bell" size="{{ 24 }}" hint-size="24px,24px"></x-import></button>
+            </header>
+            <section style="padding:0 var(--space-4)">
+              <div style="display:flex;align-items:center;gap:var(--space-3);background:var(--surface-raised);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4)">
+                <x-import component-from-global-scope="OraXDesignSystem_d465f6.Icon" name="map-pin" size="{{ 24 }}" style="{{ brandIconStyle }}" hint-size="24px,24px"></x-import>
+                <div style="flex:1;min-width:0">
+                  <div style="font:var(--text-body-strong)">{{ venueName }}</div>
+                  <div style="font:var(--text-caption);color:var(--ink-muted)">{{ city }} · 400 m · tonight 19:30</div>
+                </div>
+                <x-import component-from-global-scope="OraXDesignSystem_d465f6.Icon" name="chevron-right" size="{{ 20 }}" style="{{ mutedIconStyle }}" hint-size="20px,20px"></x-import>
+              </div>
+            </section>
+            <section style="padding:0 var(--space-4)">
+              <button type="button" onClick="{{ goBoard }}" style="width:100%;box-sizing:border-box;margin-top:var(--space-3);display:flex;align-items:center;gap:var(--space-3);background:var(--surface-raised);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);color:var(--ink);text-align:left;cursor:pointer;font:inherit">
+                <x-import component-from-global-scope="OraXDesignSystem_d465f6.Icon" name="utensils" size="{{ 24 }}" style="{{ brandIconStyle }}" hint-size="24px,24px"></x-import>
+                <div style="flex:1;min-width:0">
+                  <div style="font:var(--text-body-strong)">Build-A-Dish</div>
+                  <div style="font:var(--text-caption);color:var(--ink-muted)">{{ totalCooking }} cooking in {{ city }} · resets {{ resetIn }}</div>
+                </div>
+                <x-import component-from-global-scope="OraXDesignSystem_d465f6.Icon" name="chevron-right" size="{{ 20 }}" style="{{ mutedIconStyle }}" hint-size="20px,20px"></x-import>
+              </button>
+            </section>
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-3);padding:var(--space-5) var(--space-4) var(--space-3)">
+              <h1 style="margin:0;font:var(--text-heading-md);letter-spacing:var(--tracking-heading-md);white-space:nowrap">Your party</h1>
+              <span style="font:var(--text-pixel-label);letter-spacing:var(--tracking-pixel-label);text-transform:uppercase;color:var(--ink-muted);white-space:nowrap">Round 1 · Limit ×2</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-3);padding:0 var(--space-4)">
+              <x-import component-from-global-scope="OraXDesignSystem_d465f6.ClassCard" class-key="{{ playerClass }}" slot="{{ 1 }}" current="{{ true }}" width="100%" gems="{{ myGems }}" footer="Limit ×1.5 · Shift" hint-size="100%,210px"></x-import>
+              <x-import component-from-global-scope="OraXDesignSystem_d465f6.ClassCard" class-key="{{ otherA.key }}" figure="{{ otherA.figure }}" slot="{{ 2 }}" width="100%" gems="{{ otherA.gems }}" footer="{{ otherA.footer }}" hint-size="100%,210px"></x-import>
+              <x-import component-from-global-scope="OraXDesignSystem_d465f6.ClassCard" class-key="{{ otherB.key }}" figure="{{ otherB.figure }}" slot="{{ 3 }}" width="100%" gems="{{ otherB.gems }}" footer="{{ otherB.footer }}" hint-size="100%,210px"></x-import>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isClasses }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="Choose class" style="display:flex;flex-direction:column;height:100%">
+            <div style="flex:1;min-height:0;overflow:auto;padding:var(--space-3) var(--space-4) var(--space-4);box-sizing:border-box">
+              <h1 style="margin:0;font:var(--text-heading-md);letter-spacing:var(--tracking-heading-md)">Choose your class</h1>
+              <p style="margin:var(--space-2) 0 var(--space-4);font:var(--text-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--ink-muted)">Matched by who you are, not by skill</p>
+              <div style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:var(--space-2)">
+                <sc-for list="{{ classTiles }}" as="c" hint-placeholder-count="9">
+                  <button type="button" onClick="{{ c.pick }}" aria-pressed="{{ c.selected }}" style="{{ c.style }}">
+                    <span aria-hidden="true" style="{{ c.avatar }}"></span>
+                    <span style="{{ c.nameStyle }}">{{ c.name }}</span>
+                    <span style="font:var(--text-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--ink-muted);min-height:14px">{{ c.role }}</span>
+                  </button>
+                </sc-for>
+              </div>
+              <section style="padding-top:var(--space-5)">
+                <p style="margin:0 0 var(--space-2);font:var(--text-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--ink-muted)">Choose your gem</p>
+                <div style="display:flex;align-items:center;gap:var(--space-4);background:var(--surface-raised);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-4)">
+                  <div style="display:flex;gap:var(--space-2);flex:none">
+                    <sc-for list="{{ gemPickers }}" as="g" hint-placeholder-count="3">
+                      <x-import component-from-global-scope="OraXDesignSystem_d465f6.GemSocket" gem="{{ g.gem }}" size="{{ 64 }}" active="{{ g.active }}" on-click="{{ g.pick }}" label="{{ g.label }}" hint-size="64px,64px"></x-import>
+                    </sc-for>
+                  </div>
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-1)">
+                    <x-import component-from-global-scope="OraXDesignSystem_d465f6.Chip" variant="{{ playerGem }}" hint-size="auto,26px"></x-import>
+                    <span style="font:var(--text-caption);color:var(--ink-muted)">{{ gemCut }}</span>
+                  </div>
+                </div>
+              </section>
+            </div>
+            <div style="flex:none;padding:var(--space-3) var(--space-4) var(--space-4);border-top:1px solid var(--border)">
+              <x-import component-from-global-scope="OraXDesignSystem_d465f6.Button" block="{{ true }}" on-click="{{ goPlay }}" hint-size="100%,44px">Play as {{ playerClassName }}</x-import>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isYou }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="You" style="display:flex;flex-direction:column;height:100%;overflow:auto;box-sizing:border-box;padding:0 var(--space-4) var(--space-4);gap:var(--space-4)">
+            <header style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-3) 0 0">
+              <h1 style="margin:0;font:var(--text-heading-md);letter-spacing:var(--tracking-heading-md)">You</h1>
+              <button type="button" aria-label="Settings" style="width:44px;height:44px;margin-right:-10px;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:0;border-radius:var(--radius-md);color:var(--ink);cursor:pointer;padding:0"><x-import component-from-global-scope="OraXDesignSystem_d465f6.Icon" name="settings" size="{{ 24 }}" hint-size="24px,24px"></x-import></button>
+            </header>
+            <section style="display:flex;flex-direction:column;align-items:center;gap:var(--space-3);background:var(--surface-raised);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-5) var(--space-4)">
+              <span aria-hidden="true" style="{{ meAvatar96 }}"></span>
+              <div style="text-align:center">
+                <div style="font:var(--text-heading-sm);letter-spacing:var(--tracking-heading-sm)">Ayu</div>
+                <div style="display:flex;align-items:baseline;justify-content:center;gap:var(--space-2);margin-top:4px">
+                  <span style="{{ meClassStyle }}">{{ playerClassName }}</span>
+                  <span style="font:var(--text-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--ink-muted)">{{ playerRole }}</span>
+                </div>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:var(--space-2)">
+                <x-import component-from-global-scope="OraXDesignSystem_d465f6.Chip" variant="{{ playerGem }}" hint-size="auto,26px"></x-import>
+                <x-import component-from-global-scope="OraXDesignSystem_d465f6.Chip" appearance="subtle" hint-size="auto,26px">{{ city }}</x-import>
+                <x-import component-from-global-scope="OraXDesignSystem_d465f6.Chip" appearance="subtle" hint-size="auto,26px">Hawker regular</x-import>
+              </div>
+              <p style="margin:0;text-align:center;width:100%;font:var(--text-caption);color:var(--ink-muted)">{{ gemName }} {{ playerClassName }} · {{ platesThisMonth }} plates this month</p>
+            </section>
+            <section style="display:flex;flex-direction:column;gap:var(--space-2)">
+              <span style="font:var(--text-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--ink-muted)">Signature Dish</span>
+              <sc-if value="{{ hasSignature }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:var(--space-3);background:var(--surface-raised);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4)">
+                  <div style="width:72px;height:72px;flex:none"><image-slot id="bad-signature" shape="circle" placeholder="Dish render" style="width:72px;height:72px"></image-slot></div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font:var(--text-body-strong);text-wrap:pretty">{{ signature.name }}</div>
+                    <div style="font:var(--text-caption);color:var(--ink-muted)">{{ signature.label }} · {{ signature.date }}</div>
+                    <div style="display:flex;gap:6px;padding:6px 2px 0">
+                      <sc-for list="{{ signatureMinis }}" as="m" hint-placeholder-count="3">
+                        <span style="{{ m.style }}"><span aria-hidden="true" style="{{ m.imgStyle }}"></span></span>
+                      </sc-for>
+                    </div>
+                  </div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ noSignature }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);background:var(--surface-raised);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4)">
+                  <span style="font:var(--text-caption);color:var(--ink-muted)">No Signature Dish yet. Cook one and keep it.</span>
+                  <x-import component-from-global-scope="OraXDesignSystem_d465f6.Button" variant="ghost" on-click="{{ goBoard }}" hint-size="auto,44px">Today's dishes</x-import>
+                </div>
+              </sc-if>
+            </section>
+            <section style="display:flex;flex-direction:column;gap:var(--space-2)">
+              <span style="font:var(--text-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--ink-muted)">Your habits</span>
+              <div style="display:flex;flex-wrap:wrap;gap:var(--space-2)">
+                <sc-for list="{{ habitChips }}" as="h" hint-placeholder-count="3">
+                  <x-import component-from-global-scope="OraXDesignSystem_d465f6.Chip" appearance="subtle" hint-size="auto,26px">{{ h.label }}</x-import>
+                </sc-for>
+              </div>
+            </section>
+            <div style="display:flex;flex-direction:column;gap:var(--space-2);margin-top:auto;padding-top:var(--space-2)">
+              <x-import component-from-global-scope="OraXDesignSystem_d465f6.Button" variant="secondary" block="{{ true }}" hint-size="100%,44px">Wardrobe</x-import>
+              <x-import component-from-global-scope="OraXDesignSystem_d465f6.Button" variant="ghost" block="{{ true }}" on-click="{{ goClasses }}" hint-size="100%,44px">Change class</x-import>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+          <div role="status" style="position:absolute;left:var(--space-4);right:var(--space-4);bottom:112px;z-index:5;background:var(--surface-raised);border:1px solid var(--border-strong);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);animation:bad-toast 200ms var(--ease-standard)">
+            <div style="font:var(--text-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--ink-muted)">The Bin</div>
+            <div style="margin-top:2px;font:var(--text-body);text-wrap:pretty">{{ toast }}</div>
+          </div>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ showTabs }}" hint-placeholder-val="{{ false }}">
+        <nav aria-label="Main" style="display:flex;flex:none;border-top:1px solid var(--border);background:var(--surface-raised)">
+          <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+            <button type="button" onClick="{{ t.go }}" aria-current="{{ t.current }}" style="{{ t.style }}">
+              <x-import component-from-global-scope="OraXDesignSystem_d465f6.Icon" name="{{ t.icon }}" size="{{ 24 }}" hint-size="24px,24px"></x-import>
+              <span>{{ t.label }}</span>
+            </button>
+          </sc-for>
+        </nav>
+      </sc-if>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);justify-content:center;max-width:390px;align-items:center">
+      <span style="font:var(--text-caption);color:var(--ink-muted)">Screen</span>
+      <sc-for list="{{ jumps }}" as="j" hint-placeholder-count="11">
+        <button type="button" onClick="{{ j.go }}" style="{{ j.style }}">{{ j.label }}</button>
+      </sc-for>
+    </div>
+    <p style="margin:0;max-width:390px;text-align:center;font:var(--text-caption);color:var(--ink-muted)">Tweaks: city, Leftovers hour, class, gem, theme, intro, cuisine tags.</p>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;city&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Singapore&quot;,&quot;options&quot;:[&quot;Singapore&quot;,&quot;Kuala Lumpur&quot;],&quot;tsType&quot;:&quot;'Singapore' | 'Kuala Lumpur'&quot;,&quot;section&quot;:&quot;World&quot;},&quot;leftoversHour&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;auto&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;on&quot;,&quot;off&quot;],&quot;tsType&quot;:&quot;'auto' | 'on' | 'off'&quot;,&quot;section&quot;:&quot;World&quot;},&quot;cuisineTag&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;World&quot;},&quot;playerClass&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;stirrer&quot;,&quot;options&quot;:[&quot;provider&quot;,&quot;foodsmith&quot;,&quot;spark&quot;,&quot;gastronaut&quot;,&quot;taster&quot;,&quot;purist&quot;,&quot;rebel&quot;,&quot;stirrer&quot;,&quot;host&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Player&quot;},&quot;playerGem&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;ruby&quot;,&quot;options&quot;:[&quot;ruby&quot;,&quot;sapphire&quot;,&quot;emerald&quot;],&quot;tsType&quot;:&quot;'ruby' | 'sapphire' | 'emerald'&quot;,&quot;section&quot;:&quot;Player&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;dark&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;tsType&quot;:&quot;'dark' | 'light'&quot;,&quot;section&quot;:&quot;Display&quot;},&quot;showIntro&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Display&quot;}}">
+const A = 'orax/assets/';
+const CLASSES = {
+  provider: { name: 'Provider', role: 'Fighter', board: '01-provider-board.png' },
+  foodsmith: { name: 'Foodsmith', role: '', board: '02-foodsmith-board.png' },
+  spark: { name: 'Spark', role: '', board: '03-spark-board.png' },
+  gastronaut: { name: 'Gastronaut', role: '', board: '04-gastronaut-board.png' },
+  taster: { name: 'Taster', role: 'Rogue', board: '05-taster-board.png' },
+  purist: { name: 'Purist', role: '', board: '06-purist-board.png' },
+  rebel: { name: 'Rebel', role: '', board: '07-rebel-board.png' },
+  stirrer: { name: 'Stirrer', role: 'Mage', board: '08-stirrer-board.png' },
+  host: { name: 'Host', role: '', board: '09-host-board.png' },
+};
+const CLASS_ORDER = Object.keys(CLASSES);
+const FIG = { t1m: { x: 0.28, y: 0.09 }, t1f: { x: 0.72, y: 0.09 }, t2m: { x: 0.28, y: 0.585 }, t2f: { x: 0.72, y: 0.585 } };
+const GEM_NAME = { ruby: 'Ruby', sapphire: 'Sapphire', emerald: 'Emerald' };
+const GEM_PLURAL = { ruby: ['ruby', 'rubies'], sapphire: ['sapphire', 'sapphires'], emerald: ['emerald', 'emeralds'] };
+const GEM_CUT = { ruby: 'Round brilliant · round setting', sapphire: 'Cushion · rounded-square setting', emerald: 'Lozenge · diamond setting' };
+const GEMS3 = ['ruby', 'sapphire', 'emerald'];
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const I = (name, cut, heat, tags = [], x = {}) => ({ name, needsCut: !!cut, needsHeat: !!heat, tags, ...x });
+const ING = {
+  chicken: I('Poached chicken', 1, 1, ['protein']), rice: I('Chicken rice', 0, 1, ['rice']), ginger: I('Ginger sauce', 0, 0, ['sauce']), 'chilli-sauce': I('Chilli sauce', 0, 0, ['sauce', 'chilli']), cucumber: I('Cucumber', 1, 0), 'dark-soy': I('Dark soy', 0, 0, ['sauce']),
+  spaghetti: I('Spaghetti', 0, 1, ['carb']), garlic: I('Garlic', 1, 1), 'olive-oil': I('Olive oil', 0, 1, ['sauce']), 'chilli-flakes': I('Chilli flakes', 0, 0, ['chilli']), parsley: I('Parsley', 1, 0), parmesan: I('Parmesan', 0, 0),
+  mutton: I('Mutton', 1, 1, ['protein']), spices: I('Soup spices', 0, 1), onion: I('Onion', 1, 1), coriander: I('Coriander', 1, 0), baguette: I('Baguette', 1, 0), roti: I('Roti', 0, 1), sourdough: I('Sourdough', 1, 1),
+  'coconut-rice': I('Coconut rice', 0, 1, ['rice']), sambal: I('Sambal', 0, 1, ['sauce', 'chilli']), anchovies: I('Fried anchovies', 0, 1), peanuts: I('Peanuts', 0, 1), egg: I('Egg', 0, 1),
+  fish: I('Fish fillet', 1, 1, ['protein']), batter: I('Batter', 0, 1), potato: I('Potato', 1, 1), peas: I('Mushy peas', 0, 1), tartare: I('Tartare', 0, 0, ['sauce']), lemon: I('Lemon', 1, 0),
+  'chilli-padi': I('Chilli padi', 1, 0, ['chilli'], { extra: true }), durian: I('Durian', 0, 0, [], { extra: true }), cheddar: I('Cheddar', 0, 0, [], { extra: true }), 'ice-cream': I('Ice cream', 0, 0, [], { extra: true }),
+};
+const EXTRAS = ['chilli-padi', 'durian', 'cheddar', 'ice-cream'];
+const STOCK0 = { chicken: 22, rice: 64, ginger: 88, 'chilli-sauce': 71, cucumber: 0, 'dark-soy': 93, spaghetti: 58, garlic: 47, 'olive-oil': 80, 'chilli-flakes': 66, parsley: 31, parmesan: 14, mutton: 36, spices: 77, onion: 52, coriander: 19, baguette: 41, roti: 0, sourdough: 63, 'coconut-rice': 55, sambal: 29, anchovies: 72, peanuts: 84, egg: 11, fish: 24, batter: 69, potato: 76, peas: 38, tartare: 57, lemon: 45, 'chilli-padi': 81, durian: 97, cheddar: 74, 'ice-cream': 16 };
+const DISHES = [
+  { id: 'chicken-rice', name: 'Hainanese chicken rice', short: 'Chicken rice', cuisine: 'Hainanese · Singapore', cooking: 38, cooks: [['taster', 't1f'], ['provider', 't2m'], ['host', 't1f']], ingredients: ['chicken', 'rice', 'ginger', 'chilli-sauce', 'cucumber', 'dark-soy'] },
+  { id: 'aglio-olio', name: 'Spaghetti aglio e olio', short: 'Aglio e olio', cuisine: 'Italian', cooking: 21, cooks: [['spark', 't2f'], ['purist', 't1m'], ['foodsmith', 't1m']], ingredients: ['spaghetti', 'garlic', 'olive-oil', 'chilli-flakes', 'parsley', 'parmesan'] },
+  { id: 'mutton-soup', name: 'Sup kambing', short: 'Mutton soup', cuisine: 'Malay · Indian-Muslim', cooking: 12, cooks: [['rebel', 't2m'], ['gastronaut', 't1f'], ['stirrer', 't1m']], ingredients: ['mutton', 'spices', 'onion', 'coriander'], optional: ['baguette', 'roti', 'sourdough'] },
+  { id: 'nasi-lemak', name: 'Nasi lemak', short: 'Nasi lemak', cuisine: 'Malay · Kuala Lumpur', cooking: 44, cooks: [['provider', 't1m'], ['host', 't2f'], ['spark', 't1f']], ingredients: ['coconut-rice', 'sambal', 'anchovies', 'peanuts', 'egg', 'cucumber'] },
+  { id: 'fish-chips', name: 'Fish and chips', short: 'Fish and chips', cuisine: 'British', cooking: 9, cooks: [['foodsmith', 't2m'], ['taster', 't1m'], ['purist', 't2f']], ingredients: ['fish', 'batter', 'potato', 'peas', 'tartare', 'lemon'] },
+];
+const DISH_MAP = Object.fromEntries(DISHES.map((d) => [d.id, d]));
+const COOKS = [['Wei Lin', 'taster', 't1f'], ['Farhan', 'provider', 't2m'], ['Priya', 'host', 't1f'], ['Jun Hao', 'foodsmith', 't1m'], ['Aisyah', 'spark', 't2f'], ['Marcus', 'rebel', 't2m'], ['Nadia', 'gastronaut', 't1f'], ['Kavi', 'purist', 't1m']];
+const TONES = ['Strange', 'Suspicious', 'Chaotic', 'Questionable', 'Cursed', 'Experimental', 'Unfortunate'];
+const BASES = ['Plate', 'Bowl', 'Creation', 'Mess', 'Heap', 'Accident'];
+const DETAILS = ['of unknown origin', 'with too much confidence', 'gone slightly wrong', 'that should not exist'];
+const NUM = { 4: 'Four', 5: 'Five', 6: 'Six', 7: 'Seven', 8: 'Eight', 9: 'Nine', 10: 'Ten', 11: 'Eleven', 12: 'Twelve' };
+const LINES = {
+  3: ['Fine. I have eaten worse on purpose.', 'Acceptable. Do not let it go to your head.', 'Clean plate. I have nothing to add, which annoys me.'],
+  2: ['Edible. That is the whole review.', 'You were close. Closeness is not a flavour.', 'The rice is doing all the work here.'],
+  1: ['I am a bin and even I have standards.', 'This plate lost an argument with itself.', 'I will eat it. I will not enjoy it. I never do.'],
+};
+const CAP_LINES = ['Three is plenty. Come back at leftovers hour.', 'The whole city eats from this shelf. Three.', 'No. Leftovers hour starts at 21:00.'];
+const FLING_LINES = ['Rude. Delicious, but rude.', 'I was going to eat that anyway.', 'Noted. Everything is noted.'];
+const SEED_GALLERY = [
+  { name: 'Cursed Bowl that should not exist', hint: 'meant to be laksa', date: '19 Sep', line: 'I am a bin and even I have standards.' },
+  { name: 'Experimental Mess gone slightly wrong', hint: 'meant to be carbonara', date: '12 Sep', line: 'Cream, egg, ice cream. One of these is not a sauce.' },
+];
+const THREAD = [
+  ['Wei Lin', 'taster', 't1f', '18:02', 'who else ran out of cucumber. the whole east side is dry'],
+  ['Farhan', 'provider', 't2m', '18:40', 'leftovers hour at 21:00. ginger sauce is at 88%. no cap. see you there'],
+  ['Aisyah', 'spark', 't2f', '19:15', 'the Bin said it counted. it did not count.'],
+];
+const PARTY = { taster: { figure: 't1f', gems: [{ gem: 'emerald' }, { gem: 'emerald' }, { gem: 'sapphire' }], footer: 'Limit ×1.5 · Break' }, provider: { figure: 't2m', gems: [{ gem: 'ruby' }, { gem: 'ruby' }, { gem: 'emerald', active: true }], footer: 'Limit ×2' }, stirrer: { figure: 't1m', gems: [{ gem: 'sapphire' }, { gem: 'sapphire' }, { gem: 'ruby', active: true }], footer: 'Limit ×1.5 · Shift' } };
+const hash = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+const stockState = (v) => (v <= 0 ? 'gone' : v <= 25 ? 'low' : 'plenty');
+const pad2 = (n) => String(n).padStart(2, '0');
+const CUT_WORDS = ['', 'cut', 'diced', 'dust'];
+const HEAT_WORDS = ['', 'cooked', 'seared', 'burnt'];
+function prepText(p, showRaw) { const parts = [CUT_WORDS[p.cut || 0], HEAT_WORDS[p.heat || 0]].filter(Boolean); return parts.length ? parts.join(' · ') : (showRaw ? 'raw' : ''); }
+function crop(cls, fig = 't1m', zoom = 4.5) { const f = FIG[fig] || FIG.t1m; const pos = (v) => (((0.5 - v * zoom) / (1 - zoom)) * 100).toFixed(2) + '%'; return { backgroundImage: `url("${A}Classes/${CLASSES[cls].board}")`, backgroundSize: `${zoom * 100}%`, backgroundPosition: `${pos(f.x)} ${pos(f.y)}`, backgroundRepeat: 'no-repeat' }; }
+function toPath(pts) { if (!pts || !pts.length) return ''; return pts.map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' '); }
+function classify(pts, w) {
+  if (!pts || pts.length < 4) return null;
+  let len = 0, turn = 0, prev = null;
+  for (let i = 1; i < pts.length; i++) {
+    const dx = pts[i].x - pts[i - 1].x, dy = pts[i].y - pts[i - 1].y, d = Math.hypot(dx, dy);
+    len += d; if (d < 2) continue;
+    const a = Math.atan2(dy, dx);
+    if (prev !== null) { let da = a - prev; while (da > Math.PI) da -= 2 * Math.PI; while (da < -Math.PI) da += 2 * Math.PI; turn += Math.abs(da); }
+    prev = a;
+  }
+  if (len < 24) return null;
+  const f = pts[0], l = pts[pts.length - 1], dx = l.x - f.x, dy = l.y - f.y, disp = Math.hypot(dx, dy);
+  const straight = disp / len, dur = Math.max(1, l.t - f.t), fast = len / dur > 0.9 && len > 60;
+  if (turn > 4.2) return { kind: 'heat', fast };
+  if (straight > 0.7 && -dy > 0.6 * disp) return { kind: 'plate', fast };
+  if (straight > 0.85 && Math.abs(dx) > 0.85 * disp && len > 0.55 * w) return { kind: 'clean', fast };
+  if (straight > 0.55) return { kind: 'cut', fast };
+  return { kind: turn > 2.4 ? 'heat' : 'cut', fast };
+}
+
+class Component extends DCLogic {
+  state = { screen: 'intro', introStep: 0, tab: 'dish', playerClass: null, playerGem: null, picked: null, swapsLeft: 1, selectedDish: null, plate: {}, selectedIng: null, flair: 0, mess: 0, splats: [], stock: { ...STOCK0 }, binEaten: 1204, toast: null, sigil: null, strokePath: '', strokeFade: false, verdict: null, signature: null, gallery: SEED_GALLERY.slice(), history: { chilli: 2, rawRice: 1, unhinged: 2, plates: 14 }, sent: false, now: Date.now() };
+  componentDidMount() { this.tick = setInterval(() => this.setState({ now: Date.now() }), 1000); }
+  componentWillUnmount() { clearInterval(this.tick); clearTimeout(this.toastT); clearTimeout(this.sigilT); clearTimeout(this.strokeT); }
+  componentDidUpdate(p) {
+    if (p.playerClass !== this.props.playerClass && this.state.playerClass) this.setState({ playerClass: null });
+    if (p.playerGem !== this.props.playerGem && this.state.playerGem) this.setState({ playerGem: null });
+  }
+  city() { return this.props.city ?? 'Singapore'; }
+  cls() { return this.state.playerClass ?? this.props.playerClass ?? 'stirrer'; }
+  gem() { return this.state.playerGem ?? this.props.playerGem ?? 'ruby'; }
+  cityHour() { return Math.floor(((this.state.now + 8 * 36e5) % 864e5) / 36e5); }
+  leftovers() { const p = this.props.leftoversHour ?? 'auto'; return p === 'on' || (p === 'auto' && this.cityHour() >= 21); }
+  remark(t) { clearTimeout(this.toastT); this.setState({ toast: t }); this.toastT = setTimeout(() => this.setState({ toast: null }), 2800); }
+  showSigil(t) { clearTimeout(this.sigilT); this.setState({ sigil: t }); this.sigilT = setTimeout(() => this.setState({ sigil: null }), 700); }
+  go(screen, tab) { this.setState({ screen, ...(tab ? { tab } : {}) }); }
+  avatar(cls, size, fig) { return { display: 'block', width: size, height: size, flex: 'none', borderRadius: 'var(--radius-full)', background: 'var(--surface-sunken)', boxShadow: `0 0 0 ${size >= 40 ? 3 : 2}px var(--class-${cls})`, ...crop(cls, fig) }; }
+  mini(gem, on) {
+    const shape = gem === 'ruby' ? { borderRadius: 'var(--radius-full)' } : gem === 'sapphire' ? { borderRadius: 6 } : { borderRadius: 3, transform: 'rotate(45deg)' };
+    return { on, style: { width: 20, height: 20, flex: 'none', boxSizing: 'border-box', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'var(--surface-sunken)', boxShadow: `var(--shadow-socket), 0 0 0 2px ${on ? `var(--gem-${gem}-fill)` : 'var(--border)'}`, ...shape }, imgStyle: { width: 12, height: 12, display: 'block', backgroundImage: on ? `url("${A}Gems/${gem}.svg")` : 'none', backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', transform: gem === 'emerald' ? 'rotate(-45deg)' : 'none' } };
+  }
+  splat() { const r = Math.random; return { style: { position: 'absolute', left: `${12 + r() * 76}%`, top: `${18 + r() * 60}%`, width: 10 + r() * 12, height: 10 + r() * 12, borderRadius: '40% 60% 55% 45%', background: 'var(--ink-faint)', opacity: 0.7, pointerEvents: 'none' } }; }
+  dateText() { const d = new Date(this.state.now + 8 * 36e5); return `${d.getUTCDate()} ${MON[d.getUTCMonth()]} ${d.getUTCFullYear()}`; }
+  // Intro
+  nextIntro = () => { if (this.state.introStep < 2) this.setState({ introStep: this.state.introStep + 1 }); else this.setState({ screen: 'board', tab: 'dish' }); };
+  skipIntro = () => this.setState({ screen: 'board', tab: 'dish' });
+  // Board
+  selectDish(id) { this.setState({ selectedDish: id }); }
+  pickDish(id, swap) {
+    const d = DISH_MAP[id], s = this.state;
+    this.setState({ picked: id, selectedDish: id, swapsLeft: swap ? s.swapsLeft - 1 : s.swapsLeft, plate: {}, selectedIng: null, flair: 0, mess: 0, splats: [], verdict: null });
+    this.remark(swap ? `Swapped to ${d.short.toLowerCase()}. That was your one.` : `${d.short}. The whole city can see that now.`);
+  }
+  // Station
+  addPortion(id) {
+    const s = this.state, st = stockState(s.stock[id] || 0);
+    if (st === 'gone') { this.remark(`Gone. ${this.city()} ate it all before you.`); this.setState({ selectedIng: id }); return; }
+    const p = s.plate[id] || { n: 0, cut: 0, heat: 0 };
+    const capOff = this.leftovers() && st === 'plenty';
+    if (p.n >= 3 && !capOff) { this.remark(CAP_LINES[p.n % CAP_LINES.length]); this.setState({ selectedIng: id }); return; }
+    if (p.n === 3 && capOff) this.remark('Leftovers hour. Go on, then. I am watching.');
+    if (p.n === 9 && capOff) this.remark(`Ten portions of ${ING[id].name.toLowerCase()}. Ten. I am counting.`);
+    this.setState({ plate: { ...s.plate, [id]: { ...p, n: p.n + 1 } }, stock: { ...s.stock, [id]: Math.max(0, (s.stock[id] || 0) - 1) }, selectedIng: id });
+  }
+  removePortion(id) {
+    const s = this.state, p = s.plate[id]; if (!p || p.n <= 0) return;
+    const plate = { ...s.plate }; if (p.n === 1) delete plate[id]; else plate[id] = { ...p, n: p.n - 1 };
+    this.setState({ plate, stock: { ...s.stock, [id]: (s.stock[id] || 0) + 1 } });
+  }
+  fling = () => {
+    const s = this.state, id = s.selectedIng, p = id && s.plate[id]; if (!p) return;
+    const plate = { ...s.plate }; delete plate[id];
+    this.setState({ plate, selectedIng: null, mess: s.mess + 1, splats: [...s.splats, this.splat()], binEaten: s.binEaten + 1 });
+    this.remark(FLING_LINES[s.mess % FLING_LINES.length]);
+  };
+  padDown = (e) => { const r = e.currentTarget.getBoundingClientRect(); this.pts = [{ x: e.clientX - r.left, y: e.clientY - r.top, t: performance.now() }]; this.drawing = true; this.padW = r.width; try { e.currentTarget.setPointerCapture(e.pointerId); } catch (_) { /* no capture */ } clearTimeout(this.strokeT); this.setState({ strokePath: '', strokeFade: false }); };
+  padMove = (e) => { if (!this.drawing) return; const r = e.currentTarget.getBoundingClientRect(); this.pts.push({ x: e.clientX - r.left, y: e.clientY - r.top, t: performance.now() }); this.setState({ strokePath: toPath(this.pts) }); };
+  padUp = () => { if (!this.drawing) return; this.drawing = false; const g = classify(this.pts, this.padW || 358); this.setState({ strokePath: toPath(this.pts), strokeFade: true }); this.strokeT = setTimeout(() => this.setState({ strokePath: '' }), 500); this.fire(g); };
+  fire(g) {
+    if (!g) return;
+    const s = this.state, flair = s.flair + (g.fast ? 1 : 0);
+    let kind = g.kind; if (kind === 'clean' && s.mess === 0) kind = 'cut';
+    if (kind === 'plate') { this.showSigil('PLATE'); this.setState({ flair }); this.plateDish(); return; }
+    if (kind === 'clean') { this.showSigil('CLEAN'); this.setState({ mess: 0, splats: [], flair }); this.remark('Cleaner. Not clean. Cleaner.'); return; }
+    const id = s.selectedIng, p = id && s.plate[id];
+    this.showSigil(kind === 'cut' ? 'CUT' : 'HEAT');
+    if (!p) { this.setState({ flair }); this.remark('Strokes need a target. Tap something first.'); return; }
+    const name = ING[id].name.toLowerCase();
+    if (kind === 'cut') {
+      const lvl = Math.min(3, p.cut + 1);
+      if (p.cut === 3) this.remark(`The ${name} is dust. It cannot get smaller.`); else if (lvl === 3) this.remark('That is dust now. Congratulations.');
+      this.setState({ plate: { ...s.plate, [id]: { ...p, cut: lvl } }, flair }); return;
+    }
+    const lvl = Math.min(3, p.heat + 1); let extra = {};
+    if (p.heat === 3) this.remark('It cannot get more burnt. It is trying.');
+    else if (lvl === 3) { this.remark(`You burnt the ${name}. It did nothing to you.`); extra = { mess: s.mess + 1, splats: [...s.splats, this.splat()] }; }
+    this.setState({ plate: { ...s.plate, [id]: { ...p, heat: lvl } }, flair, ...extra });
+  }
+  plateNow = () => { this.showSigil('PLATE'); this.plateDish(); };
+  judge(dish, plate, flair) {
+    const all = [...dish.ingredients, ...(dish.optional || [])];
+    const items = Object.entries(plate).filter(([, p]) => p.n > 0).map(([id, p]) => ({ id, ...ING[id], ...p }));
+    const total = items.reduce((a, i) => a + i.n, 0);
+    const present = items.filter((i) => dish.ingredients.includes(i.id));
+    const coverage = present.length / dish.ingredients.length;
+    let score = 100 - Math.round((1 - coverage) * 50), burnt = 0, rawRice = false;
+    for (const i of items) {
+      if (all.includes(i.id)) {
+        if (i.needsCut && i.cut === 0) score -= 8;
+        if (i.needsHeat && i.heat === 0) { score -= 10; if (i.tags.includes('rice')) rawRice = true; }
+        if (!i.needsHeat && i.heat >= 1) score -= 4;
+        if (i.cut === 3) score -= 6;
+      }
+      if (i.heat === 3) { score -= 15; burnt++; }
+    }
+    const extras = items.filter((i) => i.extra); score -= extras.length * 20;
+    const recipeTotal = dish.ingredients.length, excess = Math.max(0, total - recipeTotal); score -= Math.min(30, excess * 3);
+    const maxItem = items.reduce((m, i) => (i.n > m.n ? i : m), { n: 0, name: '' });
+    if (maxItem.n >= 5) score -= 10;
+    score += Math.min(5, flair) * 2;
+    score = Math.max(0, Math.min(100, score));
+    const style = total === 0 ? 'Neat' : (maxItem.n >= 5 || total > recipeTotal * 2) ? 'Unhinged' : total > recipeTotal + 1 ? 'Generous' : 'Neat';
+    const cursed = total === 0 || score < 35 || extras.length >= 2 || burnt >= 2;
+    const stones = cursed ? 1 : score >= 75 ? 3 : score >= 45 ? 2 : 1;
+    const chilli = items.filter((i) => i.tags.includes('chilli')).reduce((a, i) => a + i.n, 0) >= 2;
+    const short = dish.short, lower = short.toLowerCase();
+    const sig = items.map((i) => `${i.id}${i.n}${i.cut}${i.heat}`).join('|') + dish.id, h = hash(sig);
+    let name, hint = '';
+    if (cursed) {
+      name = total === 0 ? 'Empty Plate of unknown origin' : `${TONES[h % TONES.length]} ${BASES[(h >>> 3) % BASES.length]} ${DETAILS[(h >>> 6) % DETAILS.length]}`;
+      hint = `meant to be ${lower}`;
+    } else {
+      const sauce = items.find((i) => i.tags.includes('sauce') && i.n >= 4);
+      let pre = ''; if (burnt) pre = 'Burnt '; else if (items.some((i) => i.tags.includes('protein') && i.heat === 2)) pre = 'Seared '; else if (style === 'Generous') pre = 'Generous ';
+      let suf = ''; if (sauce) suf = `, drowning in ${sauce.name.toLowerCase()}`; else if (extras.length === 1) suf = ` with ${extras[0].name.toLowerCase()}`; else if (coverage < 1) suf = ', missing something';
+      name = pre + (pre ? lower : short) + suf;
+    }
+    const saucy = items.some((i) => i.tags.includes('sauce') && i.n >= 3);
+    const label = stones === 3 ? (style === 'Neat' ? 'Clean plate' : 'Academy acceptable') : stones === 2 ? (saucy ? 'Saucy but controlled' : style === 'Generous' ? 'Bold but messy' : 'Comforting') : (cursed ? 'The Bin has questions' : 'The plate lost the argument');
+    const burntItem = items.find((i) => i.heat === 3);
+    let line;
+    if (total === 0) line = 'You plated air. Bold. Pointless, but bold.';
+    else if (extras.find((e) => e.id === 'durian')) line = `Durian. In ${lower}. I will be filing a report.`;
+    else if (maxItem.n >= 8) line = `${NUM[maxItem.n] || maxItem.n} portions of ${maxItem.name.toLowerCase()}. ${NUM[maxItem.n] || maxItem.n}. I counted.`;
+    else if (burntItem) line = `You burnt the ${burntItem.name.toLowerCase()}. It did nothing to you.`;
+    else if (rawRice) line = 'The rice is raw. Rice is the easy part.';
+    else line = LINES[stones][h % 3];
+    const waste = cursed && (extras.length >= 2 || score < 15);
+    const hst = this.state.history;
+    const sauceN = items.filter((i) => i.tags.includes('sauce')).reduce((a, i) => a + i.n, 0), protN = items.filter((i) => i.tags.includes('protein')).reduce((a, i) => a + i.n, 0);
+    const habit = chilli ? `You doubled the chilli again · ×${hst.chilli + 1}` : rawRice ? 'Raw rice. Again.' : style === 'Unhinged' ? `Unhinged plate ×${hst.unhinged + 1} this month` : (stones === 3 && style === 'Neat') ? 'Neat plater, apparently' : sauceN > protN && sauceN > 0 ? 'Sauce first, as usual' : 'A new habit is forming';
+    return { key: h, name, hint, label, line, stones, score, style, cursed, waste, habit, leftoversUsed: items.some((i) => i.n > 3), dish: short, flags: { chilli, rawRice }, summary: items.length ? items.map((i) => `${i.name} ×${i.n}`).join(' · ') : 'Nothing on the plate' };
+  }
+  plateDish() {
+    const s = this.state, dish = DISH_MAP[s.picked]; if (!dish) return;
+    const v = this.judge(dish, s.plate, s.flair);
+    const history = { ...s.history, plates: s.history.plates + 1, chilli: s.history.chilli + (v.flags.chilli ? 1 : 0), rawRice: s.history.rawRice + (v.flags.rawRice ? 1 : 0), unhinged: s.history.unhinged + (v.style === 'Unhinged' ? 1 : 0) };
+    const gallery = v.cursed ? [{ name: v.name, hint: v.hint, date: 'Today', line: v.line }, ...s.gallery] : s.gallery;
+    this.setState({ screen: 'verdict', verdict: v, binEaten: s.binEaten + 1, history, gallery, sent: false, toast: null });
+  }
+  demoPlate(dish) { const plate = {}; dish.ingredients.forEach((id, i) => { const g = ING[id]; plate[id] = { n: i === 2 ? 4 : 1, cut: g.needsCut ? 1 : 0, heat: g.needsHeat ? (i === 0 ? 2 : 1) : 0 }; }); return plate; }
+  setSignature = () => { const v = this.state.verdict; if (!v) return; this.setState({ signature: { ...v, date: this.dateText() } }); this.remark('Signature Dish set. Your profile has opinions now.'); };
+  share = () => { this.setState({ sent: true }); this.remark('Sent to your party. They did not ask for it.'); };
+  saveImage = () => this.remark('Saved. It will not get better with time.');
+  tabTo(k) { this.setState({ tab: k, screen: k === 'dish' ? 'board' : k }); }
+  jump(screen) {
+    const s = this.state, extra = {};
+    if (screen === 'intro') extra.introStep = 0;
+    if (['station', 'verdict', 'wall', 'thread', 'share'].includes(screen) && !s.picked) { extra.picked = 'chicken-rice'; extra.selectedDish = 'chicken-rice'; }
+    if (['verdict', 'wall', 'thread', 'share'].includes(screen) && !s.verdict) { const dish = DISH_MAP[extra.picked || s.picked]; const plate = this.demoPlate(dish); extra.plate = plate; extra.verdict = this.judge(dish, plate, 2); }
+    const tabFor = { board: 'dish', gallery: 'dish', play: 'play', classes: 'classes', you: 'you', intro: 'dish' };
+    this.setState({ screen, ...extra, ...(tabFor[screen] ? { tab: tabFor[screen] } : {}) });
+  }
+  wallFor(dish, v) {
+    const short = dish.short, lower = short.toLowerCase();
+    const sauceIng = dish.ingredients.map((id) => ING[id]).find((i) => i.tags.includes('sauce'));
+    const sauce = (sauceIng ? sauceIng.name : 'sauce').toLowerCase();
+    const T = [[3, `Clean ${lower}`, 'Neat', 'Fine. I have nothing to add, which annoys me.'], [3, `Seared ${lower}`, 'Generous', 'Acceptable. Do not let it go to your head.'], [2, `${short}, heavy on the ${sauce}`, 'Generous', 'Edible. That is the whole review.'], [2, `${short}, missing something`, 'Neat', 'You were close. Closeness is not a flavour.'], [1, `${short}, drowning in ${sauce}`, 'Unhinged', `Ten portions of ${sauce}. Ten. I counted.`], [1, 'Suspicious Heap with too much confidence', 'Unhinged', `Durian. In ${lower}. I will be filing a report.`]];
+    const off = DISHES.indexOf(dish);
+    const rows = T.map((t, i) => { const c = COOKS[(i + off) % COOKS.length]; return { key: 'c' + i, name: c[0], cls: c[1], fig: c[2], gem: GEMS3[(i + off) % 3], stones: t[0], variant: t[1], style: t[2], line: t[3], you: false }; });
+    if (v) rows.push({ key: 'you', name: 'You', cls: this.cls(), fig: 't1m', gem: this.gem(), stones: v.stones, variant: v.name, style: v.style, line: v.line, you: true });
+    rows.sort((a, b) => b.stones - a.stones || (a.you ? -1 : b.you ? 1 : 0));
+    return rows.map((r) => ({ ...r, clsName: CLASSES[r.cls].name, clsStyle: { font: 'var(--text-caption)', color: `var(--class-${r.cls})` }, avatar: this.avatar(r.cls, 40, r.fig), minis: [1, 2, 3].map((k) => this.mini(r.gem, k <= r.stones)), rowStyle: { display: 'flex', gap: 12, alignItems: 'center', padding: 12, boxSizing: 'border-box', borderRadius: 'var(--radius-md)', background: r.you ? 'var(--brand-subtle)' : 'var(--surface-raised)', border: `${r.you ? 2 : 1}px solid ${r.you ? 'var(--brand)' : 'var(--border)'}` } }));
+  }
+  renderVals() {
+    const s = this.state, city = this.city(), cls = this.cls(), gem = this.gem();
+    const theme = this.props.theme ?? 'dark', showCuisine = this.props.cuisineTag ?? true;
+    const screen = (this.props.showIntro === false && s.screen === 'intro') ? 'board' : s.screen;
+    const left = 864e5 - ((s.now + 8 * 36e5) % 864e5);
+    const resetIn = `${pad2(Math.floor(left / 36e5))}:${pad2(Math.floor(left / 6e4) % 60)}:${pad2(Math.floor(left / 1e3) % 60)}`;
+    const leftovers = this.leftovers();
+    const picked = s.picked ? DISH_MAP[s.picked] : null, sel = s.selectedDish ? DISH_MAP[s.selectedDish] : null;
+    const cityUpper = city.toUpperCase();
+    const dishes = DISHES.map((d) => {
+      const ings = [...d.ingredients, ...(d.optional || [])];
+      const low = ings.filter((id) => stockState(s.stock[id]) === 'low').length, gone = ings.filter((id) => stockState(s.stock[id]) === 'gone').length;
+      const isSel = s.selectedDish === d.id, isPick = s.picked === d.id;
+      return { ...d, cuisineText: showCuisine ? d.cuisine : '', meta: `${ings.length} ingredients${low ? ` · ${low} running low` : ''}${gone ? ` · ${gone} gone` : ''}`, cooking: d.cooking + (isPick ? 1 : 0), selected: isSel, picked: isPick, pick: () => this.selectDish(d.id),
+        avatars: d.cooks.map(([c, f]) => ({ style: { ...this.avatar(c, 24, f), marginLeft: -6, boxShadow: `0 0 0 2px var(--class-${c}), 0 0 0 4px var(--surface-raised)` } })),
+        cardStyle: { display: 'block', width: '100%', textAlign: 'left', boxSizing: 'border-box', padding: 'var(--space-4)', borderRadius: 'var(--radius-md)', background: isSel && !isPick ? 'var(--brand-subtle)' : 'var(--surface-raised)', border: `2px solid ${isSel || isPick ? 'var(--brand)' : 'var(--border)'}`, color: 'var(--ink)', cursor: 'pointer', font: 'inherit' } };
+    });
+    let boardCta = 'Pick a dish', boardDisabled = true, boardAction = () => {};
+    if (sel && !picked) { boardCta = `Pick ${sel.short.toLowerCase()} for today`; boardDisabled = false; boardAction = () => this.pickDish(sel.id, false); }
+    else if (picked && (!sel || sel.id === picked.id)) { boardCta = `Cook ${picked.short.toLowerCase()}`; boardDisabled = false; boardAction = () => this.go('station'); }
+    else if (picked && sel) { if (s.swapsLeft > 0) { boardCta = `Swap to ${sel.short.toLowerCase()} · 1 swap left`; boardDisabled = false; boardAction = () => this.pickDish(sel.id, true); } else boardCta = 'No swaps left today'; }
+    const ingView = (id) => {
+      const g = ING[id], st = stockState(s.stock[id]), p = s.plate[id] || { n: 0, cut: 0, heat: 0 }, selected = s.selectedIng === id, gone = st === 'gone';
+      return { id, name: g.name, n: p.n, badge: p.n > 0, canRemove: p.n > 0, selected, prep: prepText(p, false), stateText: st === 'low' ? (p.n > 0 ? 'Low' : 'Running low') : gone ? 'Gone' : '', stateStyle: { font: 'var(--text-caption)', color: st === 'low' ? 'var(--warning)' : 'var(--ink-faint)', flex: 1, minWidth: 0 }, add: () => this.addPortion(id), remove: () => this.removePortion(id),
+        cardStyle: { position: 'relative', display: 'flex', flexDirection: 'column', gap: 2, padding: '10px 10px 6px', minHeight: 100, boxSizing: 'border-box', borderRadius: 'var(--radius-md)', background: gone ? 'var(--surface-sunken)' : 'var(--surface-raised)', border: `2px solid ${selected ? 'var(--brand)' : gone ? 'transparent' : 'var(--border)'}`, color: gone ? 'var(--ink-faint)' : 'var(--ink)' } };
+    };
+    const pantryMain = picked ? picked.ingredients.map(ingView) : [], pantryOptional = picked && picked.optional ? picked.optional.map(ingView) : [], extras = EXTRAS.map(ingView);
+    const plateItems = Object.entries(s.plate).filter(([, p]) => p.n > 0).map(([id, p]) => ({ id, label: `${ING[id].name} ×${p.n}`, prep: prepText(p, true), select: () => this.setState({ selectedIng: id }), style: { display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-start', minHeight: 44, padding: '4px 12px', borderRadius: 'var(--radius-sm)', background: s.selectedIng === id ? 'var(--brand-subtle)' : 'var(--surface-sunken)', border: `2px solid ${s.selectedIng === id ? 'var(--brand)' : 'var(--border)'}`, color: 'var(--ink)', cursor: 'pointer', font: 'inherit', textAlign: 'left' } }));
+    const total = Object.values(s.plate).reduce((a, p) => a + p.n, 0), maxN = Math.max(0, ...Object.values(s.plate).map((p) => p.n));
+    const recipeTotal = picked ? picked.ingredients.length : 6;
+    const portionStyle = total === 0 ? 'Empty' : (maxN >= 5 || total > recipeTotal * 2) ? 'Unhinged' : total > recipeTotal + 1 ? 'Generous' : 'Neat';
+    const hasSelected = !!(s.selectedIng && s.plate[s.selectedIng] && s.plate[s.selectedIng].n > 0);
+    const v = s.verdict;
+    const stones = [1, 2, 3].map((k) => ({ on: !!v && k <= v.stones }));
+    const stonesText = v ? `${v.stones} of 3 ${GEM_PLURAL[gem][v.stones === 1 ? 0 : 1]}` : '';
+    const isSignature = !!(v && s.signature && s.signature.key === v.key);
+    const wallDish = picked || DISHES[0];
+    const tabs = [['play', 'Play', 'sparkles'], ['classes', 'Classes', 'shirt'], ['you', 'You', 'user'], ['dish', 'Dish', 'utensils']].map(([k, label, icon]) => { const active = s.tab === k; return { k, label, icon, current: active ? 'page' : undefined, go: () => this.tabTo(k), style: { flex: 1, minHeight: 56, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, background: 'transparent', border: 0, cursor: 'pointer', padding: '6px 0', color: active ? 'var(--brand-text)' : 'var(--ink-muted)', font: 'var(--text-caption)', fontWeight: active ? 500 : 400 } }; });
+    const jumps = [['intro', 'Intro'], ['board', 'Board'], ['station', 'Station'], ['verdict', 'Verdict'], ['wall', 'Wall'], ['thread', 'Thread'], ['gallery', 'Cursed Plates'], ['share', 'Share card'], ['play', 'Play'], ['classes', 'Classes'], ['you', 'You']].map(([k, label]) => { const active = screen === k; return { label, go: () => this.jump(k), style: { minHeight: 32, padding: '0 12px', borderRadius: 'var(--radius-sm)', border: `1px solid ${active ? 'var(--brand)' : 'var(--border-strong)'}`, background: active ? 'var(--brand-subtle)' : 'transparent', color: 'var(--ink)', font: 'var(--text-caption)', cursor: 'pointer' } }; });
+    const classTiles = CLASS_ORDER.map((k) => { const selected = k === cls; return { key: k, name: CLASSES[k].name, role: CLASSES[k].role, selected, pick: () => this.setState({ playerClass: k }), avatar: { ...this.avatar(k, 56, 't1m'), boxShadow: `0 0 0 3px var(--class-${k})`, margin: 3 }, nameStyle: { font: 'var(--text-body-strong)', color: `var(--class-${k})`, whiteSpace: 'nowrap' }, style: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-3) var(--space-2)', background: selected ? 'var(--brand-subtle)' : 'var(--surface-raised)', border: `2px solid ${selected ? 'var(--brand)' : 'var(--border)'}`, borderRadius: 'var(--radius-md)', cursor: 'pointer', color: 'var(--ink)', minWidth: 0, font: 'inherit' } }; });
+    const gemPickers = GEMS3.map((g) => ({ gem: g, active: g === gem, pick: () => this.setState({ playerGem: g }), label: `${GEM_NAME[g]} ${CLASSES[cls].name}` }));
+    const others = ['taster', 'provider', 'stirrer'].filter((k) => k !== cls).slice(0, 2).map((k) => ({ key: k, ...PARTY[k] }));
+    const habits = [`Doubles the chilli ×${s.history.chilli}`, s.history.rawRice ? `Raw rice ×${s.history.rawRice}` : null, s.history.unhinged ? `Unhinged plates ×${s.history.unhinged}` : null, 'Hawker regular'].filter(Boolean).map((label) => ({ label }));
+    const showTabs = ['board', 'gallery', 'play', 'classes', 'you'].includes(screen);
+    return {
+      theme, screen, city, cityUpper, resetIn, leftovers, playerGem: gem, playerClass: cls, playerClassName: CLASSES[cls].name, playerRole: CLASSES[cls].role, gemName: GEM_NAME[gem], gemCut: GEM_CUT[gem],
+      isIntro: screen === 'intro', isBoard: screen === 'board', isStation: screen === 'station', isVerdict: screen === 'verdict', isWall: screen === 'wall', isThread: screen === 'thread', isGallery: screen === 'gallery', isShare: screen === 'share', isPlay: screen === 'play', isClasses: screen === 'classes', isYou: screen === 'you',
+      intro1: s.introStep === 0, intro2: s.introStep === 1, intro3: s.introStep === 2, introCta: s.introStep < 2 ? 'Next' : 'Start cooking', nextIntro: this.nextIntro, skipIntro: this.skipIntro,
+      introDots: [0, 1, 2].map((i) => ({ style: { width: 8, height: 8, borderRadius: 'var(--radius-full)', background: i === s.introStep ? 'var(--brand)' : 'var(--border-strong)' } })),
+      dishes, boardCta, boardDisabled, boardAction, hasPicked: !!picked, pickedCooking: picked ? picked.cooking + 1 : 0, pickedShortLower: picked ? picked.short.toLowerCase() : '', binEatenText: s.binEaten.toLocaleString('en-SG'), cursedCount: s.gallery.length, goGallery: () => this.go('gallery', 'dish'), goBoard: () => this.go('board', 'dish'),
+      pickedName: picked ? picked.name : '', pickedCuisine: picked ? (showCuisine ? picked.cuisine : `${picked.ingredients.length} ingredients`) : '', pantryMain, pantryOptional, hasOptional: pantryOptional.length > 0, extras, plateItems, plateEmpty: plateItems.length === 0, portionStyle, flair: s.flair, hasSelected, selectedName: s.selectedIng ? ING[s.selectedIng].name : '', fling: this.fling,
+      capText: leftovers ? 'Leftovers hour · no cap on plentiful stock' : 'Cap 3 portions · leftovers hour 21:00',
+      padDown: this.padDown, padMove: this.padMove, padUp: this.padUp, strokePath: s.strokePath, strokeStyle: { opacity: s.strokeFade ? 0 : 1, transition: s.strokeFade ? 'opacity 450ms var(--ease-standard)' : 'none' }, hasSigil: !!s.sigil, sigil: s.sigil, mess: s.mess, hasMess: s.mess > 0, splats: s.splats, plateNow: this.plateNow,
+      verdict: v || {}, verdictDishLower: v ? v.dish.toLowerCase() : '', stones, stonesText, isSignature, signatureCta: isSignature ? 'Signature Dish set' : 'Set as Signature Dish', setSignature: this.setSignature, goShare: () => this.go('share'), goWall: () => this.go('wall'), goVerdict: () => this.go('verdict'), goThread: () => this.go('thread'), wallBack: () => this.go(v ? 'verdict' : 'board'),
+      wallTitle: `${wallDish.short} · ${wallDish.cooking + 3} plates today`, wallShort: wallDish.short, wallShortLower: wallDish.short.toLowerCase(), wallRows: this.wallFor(wallDish, v),
+      thread: THREAD.map(([name, c, f, time, text]) => ({ name, time, text, avatar: this.avatar(c, 32, f) })),
+      gallery: s.gallery.map((g) => ({ ...g, minis: [1, 2, 3].map((k) => this.mini(gem, k <= 1)) })),
+      dateText: this.dateText(), meAvatar44: this.avatar(cls, 44, 't1m'), meAvatar96: { ...this.avatar(cls, 96, 't1m'), margin: 3 }, meClassStyle: { font: 'var(--text-caption)', fontWeight: 500, color: `var(--class-${cls})` }, sent: s.sent, shareCta: s.sent ? 'Sent to your party' : 'Send to your party', share: this.share, saveImage: this.saveImage,
+      brandIconStyle: { color: 'var(--brand-text)' }, mutedIconStyle: { color: 'var(--ink-muted)' }, venueName: city === 'Singapore' ? 'Tiong Bahru Market' : 'Jalan Alor', totalCooking: DISHES.reduce((a, d) => a + d.cooking, 0) + (picked ? 1 : 0), myGems: [{ gem: 'sapphire' }, { gem: 'sapphire' }, { gem, active: true }], otherA: others[0], otherB: others[1],
+      classTiles, gemPickers, goPlay: () => this.go('play', 'play'), goClasses: () => this.go('classes', 'classes'),
+      hasSignature: !!s.signature, noSignature: !s.signature, signature: s.signature || {}, signatureMinis: [1, 2, 3].map((k) => this.mini(gem, !!s.signature && k <= s.signature.stones)), habitChips: habits, platesThisMonth: s.history.plates,
+      hasToast: !!s.toast, toast: s.toast, showTabs, tabs, jumps,
+    };
+  }
+}
+</script>
+</body>
+</html>

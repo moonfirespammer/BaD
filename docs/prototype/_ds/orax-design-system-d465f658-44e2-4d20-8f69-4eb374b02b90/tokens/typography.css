@@ -1,0 +1,40 @@
+/* OraX type. Space Grotesk carries everything a person reads; Silkscreen is a game signal — only tagline-lg, tagline and pixel-label use it. */
+:root{
+  --font-sans:"Space Grotesk", system-ui, sans-serif;
+  --font-pixel:"Silkscreen", "Courier New", monospace;
+  /* Display — sans 700 with negative tracking; that is what makes the face read as bold as a heavier grotesk */
+  --text-display-xl:700 56px/58px var(--font-sans);
+  --tracking-display-xl:-0.03em;
+  --text-display-lg:700 40px/44px var(--font-sans);
+  --tracking-display-lg:-0.025em;
+  --text-heading-md:700 28px/32px var(--font-sans);
+  --tracking-heading-md:-0.02em;
+  --text-heading-sm:700 20px/26px var(--font-sans);
+  --tracking-heading-sm:-0.01em;
+  /* Text */
+  --text-body-lg:400 17px/26px var(--font-sans);
+  --text-body:400 15px/22px var(--font-sans);
+  --text-body-strong:500 15px/22px var(--font-sans);
+  --text-caption:400 13px/18px var(--font-sans);
+  --text-overline:700 11px/14px var(--font-sans);
+  --tracking-overline:0.12em;
+  /* Pixel — always uppercase, never below 11px, never for anything read at length */
+  --text-tagline-lg:400 28px/36px var(--font-pixel);
+  --tracking-tagline-lg:0.02em;
+  --text-tagline:400 16px/22px var(--font-pixel);
+  --tracking-tagline:0.04em;
+  --text-pixel-label:700 11px/14px var(--font-pixel);
+  --tracking-pixel-label:0.06em;
+}
+.display-xl{font:var(--text-display-xl);letter-spacing:var(--tracking-display-xl)}
+.display-lg{font:var(--text-display-lg);letter-spacing:var(--tracking-display-lg)}
+.heading-md{font:var(--text-heading-md);letter-spacing:var(--tracking-heading-md)}
+.heading-sm{font:var(--text-heading-sm);letter-spacing:var(--tracking-heading-sm)}
+.body-lg{font:var(--text-body-lg)}
+.body{font:var(--text-body)}
+.body-strong{font:var(--text-body-strong)}
+.caption{font:var(--text-caption)}
+.overline{font:var(--text-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase}
+.tagline-lg{font:var(--text-tagline-lg);letter-spacing:var(--tracking-tagline-lg);text-transform:uppercase}
+.tagline{font:var(--text-tagline);letter-spacing:var(--tracking-tagline);text-transform:uppercase}
+.pixel-label{font:var(--text-pixel-label);letter-spacing:var(--tracking-pixel-label);text-transform:uppercase}

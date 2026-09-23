@@ -1,0 +1,368 @@
+{
+  "plugins": [
+    "react",
+    "import"
+  ],
+  "rules": {
+    "react/forbid-elements": [
+      "warn",
+      {
+        "forbid": []
+      }
+    ],
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": [
+          {
+            "group": [
+              "components/actions/**",
+              "components/brand/**",
+              "components/game/**",
+              "components/icons/**",
+              "components/shared/**",
+              "ui_kits/app/**",
+              "ui_kits/marketing/**"
+            ],
+            "message": "Import design-system components from 'index.js', not component internals."
+          }
+        ]
+      }
+    ],
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": "Literal[value=/#[0-9a-fA-F]{3,8}\\b/]",
+        "message": "Raw hex color — use a design-system color token via var()."
+      },
+      {
+        "selector": "Literal[value=/\\b\\d+px\\b/]",
+        "message": "Raw px value — use a design-system spacing token via var()."
+      },
+      {
+        "selector": "Literal[value=/font-family\\s*:\\s*(?!['\\\"]?(?:Space Grotesk|Silkscreen))/i]",
+        "message": "Font not provided by the design system. Available: Space Grotesk, Silkscreen."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute > JSXIdentifier[name!=/^(?:variant|icon|block|href|children|key|ref|className|style|children)$/]",
+        "message": "<Button> doesn't accept that prop. Declared props: variant, icon, block, href, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='variant'] > Literal[value!=/^(?:primary|secondary|ghost)$/]",
+        "message": "<Button> variant must be one of 'primary' | 'secondary' | 'ghost'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Chip'] > JSXAttribute > JSXIdentifier[name!=/^(?:variant|appearance|children|key|ref|className|style|children)$/]",
+        "message": "<Chip> doesn't accept that prop. Declared props: variant, appearance, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Chip'] > JSXAttribute[name.name='variant'] > Literal[value!=/^(?:ruby|sapphire|emerald|brand)$/]",
+        "message": "<Chip> variant must be one of 'ruby' | 'sapphire' | 'emerald' | 'brand'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Chip'] > JSXAttribute[name.name='appearance'] > Literal[value!=/^(?:filled|outline|subtle)$/]",
+        "message": "<Chip> appearance must be one of 'filled' | 'outline' | 'subtle'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ClassCardGem'] > JSXAttribute > JSXIdentifier[name!=/^(?:gem|active|onClick|key|ref|className|style|children)$/]",
+        "message": "<ClassCardGem> doesn't accept that prop. Declared props: gem, active, onClick."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ClassCardGem'] > JSXAttribute[name.name='gem'] > Literal[value!=/^(?:ruby|sapphire|emerald)$/]",
+        "message": "<ClassCardGem> gem must be one of 'ruby' | 'sapphire' | 'emerald'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Cover'] > JSXAttribute > JSXIdentifier[name!=/^(?:theme|scale|key|ref|className|style|children)$/]",
+        "message": "<Cover> doesn't accept that prop. Declared props: theme, scale."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Cover'] > JSXAttribute[name.name='theme'] > Literal[value!=/^(?:dark|light)$/]",
+        "message": "<Cover> theme must be one of 'dark' | 'light'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='GemSocket'] > JSXAttribute > JSXIdentifier[name!=/^(?:gem|active|size|onClick|label|key|ref|className|style|children)$/]",
+        "message": "<GemSocket> doesn't accept that prop. Declared props: gem, active, size, onClick, label."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='GemSocket'] > JSXAttribute[name.name='gem'] > Literal[value!=/^(?:ruby|sapphire|emerald)$/]",
+        "message": "<GemSocket> gem must be one of 'ruby' | 'sapphire' | 'emerald'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Icon'] > JSXAttribute > JSXIdentifier[name!=/^(?:name|size|strokeWidth|label|key|ref|className|style|children)$/]",
+        "message": "<Icon> doesn't accept that prop. Declared props: name, size, strokeWidth, label."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Logo'] > JSXAttribute > JSXIdentifier[name!=/^(?:height|ground|alt|key|ref|className|style|children)$/]",
+        "message": "<Logo> doesn't accept that prop. Declared props: height, ground, alt."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Logo'] > JSXAttribute[name.name='ground'] > Literal[value!=/^(?:auto|dark|light|white)$/]",
+        "message": "<Logo> ground must be one of 'auto' | 'dark' | 'light' | 'white'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Tagline'] > JSXAttribute > JSXIdentifier[name!=/^(?:size|align|key|ref|className|style|children)$/]",
+        "message": "<Tagline> doesn't accept that prop. Declared props: size, align."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Tagline'] > JSXAttribute[name.name='size'] > Literal[value!=/^(?:lg|md)$/]",
+        "message": "<Tagline> size must be one of 'lg' | 'md'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Tagline'] > JSXAttribute[name.name='align'] > Literal[value!=/^(?:left|center|right)$/]",
+        "message": "<Tagline> align must be one of 'left' | 'center' | 'right'."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/index.js"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
+  "x-omelette": {
+    "components": {
+      "Button": {
+        "replaces": []
+      },
+      "Chip": {
+        "replaces": []
+      },
+      "ClassCardGem": {
+        "replaces": []
+      },
+      "Cover": {
+        "replaces": []
+      },
+      "GemSocket": {
+        "replaces": []
+      },
+      "Icon": {
+        "replaces": []
+      },
+      "Logo": {
+        "replaces": []
+      },
+      "Tagline": {
+        "replaces": []
+      }
+    },
+    "tokens": [
+      "--border",
+      "--border-strong",
+      "--brand",
+      "--brand-deep",
+      "--brand-subtle",
+      "--brand-text",
+      "--class-foodsmith",
+      "--class-gastronaut",
+      "--class-host",
+      "--class-provider",
+      "--class-purist",
+      "--class-rebel",
+      "--class-spark",
+      "--class-stirrer",
+      "--class-taster",
+      "--danger",
+      "--ease-standard",
+      "--focus",
+      "--focus-offset",
+      "--focus-ring",
+      "--font-pixel",
+      "--font-sans",
+      "--gem-emerald-base",
+      "--gem-emerald-deep",
+      "--gem-emerald-fill",
+      "--gem-emerald-glint",
+      "--gem-emerald-light",
+      "--gem-emerald-on",
+      "--gem-emerald-shadow",
+      "--gem-emerald-text",
+      "--gem-ruby-base",
+      "--gem-ruby-deep",
+      "--gem-ruby-fill",
+      "--gem-ruby-glint",
+      "--gem-ruby-light",
+      "--gem-ruby-on",
+      "--gem-ruby-shadow",
+      "--gem-ruby-text",
+      "--gem-sapphire-base",
+      "--gem-sapphire-deep",
+      "--gem-sapphire-fill",
+      "--gem-sapphire-glint",
+      "--gem-sapphire-light",
+      "--gem-sapphire-on",
+      "--gem-sapphire-shadow",
+      "--gem-sapphire-text",
+      "--glow-brand",
+      "--glow-emerald",
+      "--glow-ruby",
+      "--glow-sapphire",
+      "--gutter",
+      "--info",
+      "--ink",
+      "--ink-faint",
+      "--ink-muted",
+      "--layout-mobile",
+      "--logo-plate",
+      "--logo-ring",
+      "--motion-base",
+      "--motion-fast",
+      "--on-brand",
+      "--radius-full",
+      "--radius-lg",
+      "--radius-md",
+      "--radius-sm",
+      "--ring-active",
+      "--shadow-raised",
+      "--shadow-socket",
+      "--space-1",
+      "--space-2",
+      "--space-3",
+      "--space-4",
+      "--space-5",
+      "--space-6",
+      "--space-7",
+      "--space-8",
+      "--success",
+      "--surface",
+      "--surface-overlay",
+      "--surface-raised",
+      "--surface-sunken",
+      "--text-body",
+      "--text-body-lg",
+      "--text-body-strong",
+      "--text-caption",
+      "--text-display-lg",
+      "--text-display-xl",
+      "--text-heading-md",
+      "--text-heading-sm",
+      "--text-overline",
+      "--text-pixel-label",
+      "--text-tagline",
+      "--text-tagline-lg",
+      "--touch-target",
+      "--tracking-display-lg",
+      "--tracking-display-xl",
+      "--tracking-heading-md",
+      "--tracking-heading-sm",
+      "--tracking-overline",
+      "--tracking-pixel-label",
+      "--tracking-tagline",
+      "--tracking-tagline-lg",
+      "--warning"
+    ],
+    "tokenKinds": {
+      "--surface": "color",
+      "--surface-raised": "color",
+      "--surface-sunken": "color",
+      "--surface-overlay": "color",
+      "--ink": "color",
+      "--ink-muted": "color",
+      "--ink-faint": "color",
+      "--border": "color",
+      "--border-strong": "color",
+      "--logo-ring": "color",
+      "--logo-plate": "color",
+      "--brand": "color",
+      "--brand-deep": "color",
+      "--brand-text": "font",
+      "--brand-subtle": "color",
+      "--on-brand": "color",
+      "--focus": "color",
+      "--success": "color",
+      "--warning": "color",
+      "--danger": "color",
+      "--info": "color",
+      "--gem-ruby-glint": "color",
+      "--gem-ruby-light": "color",
+      "--gem-ruby-base": "color",
+      "--gem-ruby-deep": "color",
+      "--gem-ruby-shadow": "shadow",
+      "--gem-sapphire-glint": "color",
+      "--gem-sapphire-light": "color",
+      "--gem-sapphire-base": "color",
+      "--gem-sapphire-deep": "color",
+      "--gem-sapphire-shadow": "shadow",
+      "--gem-emerald-glint": "color",
+      "--gem-emerald-light": "color",
+      "--gem-emerald-base": "color",
+      "--gem-emerald-deep": "color",
+      "--gem-emerald-shadow": "shadow",
+      "--gem-ruby-text": "font",
+      "--gem-ruby-fill": "color",
+      "--gem-ruby-on": "color",
+      "--gem-sapphire-text": "font",
+      "--gem-sapphire-fill": "color",
+      "--gem-sapphire-on": "color",
+      "--gem-emerald-text": "font",
+      "--gem-emerald-fill": "color",
+      "--gem-emerald-on": "color",
+      "--class-provider": "color",
+      "--class-foodsmith": "color",
+      "--class-spark": "color",
+      "--class-gastronaut": "color",
+      "--class-taster": "color",
+      "--class-purist": "color",
+      "--class-rebel": "color",
+      "--class-stirrer": "color",
+      "--class-host": "color",
+      "--font-sans": "font",
+      "--font-pixel": "font",
+      "--text-display-xl": "font",
+      "--tracking-display-xl": "font",
+      "--text-display-lg": "font",
+      "--tracking-display-lg": "font",
+      "--text-heading-md": "font",
+      "--tracking-heading-md": "font",
+      "--text-heading-sm": "font",
+      "--tracking-heading-sm": "font",
+      "--text-body-lg": "font",
+      "--text-body": "font",
+      "--text-body-strong": "font",
+      "--text-caption": "font",
+      "--text-overline": "font",
+      "--tracking-overline": "font",
+      "--text-tagline-lg": "font",
+      "--tracking-tagline-lg": "font",
+      "--text-tagline": "font",
+      "--tracking-tagline": "font",
+      "--text-pixel-label": "font",
+      "--tracking-pixel-label": "font",
+      "--space-1": "spacing",
+      "--space-2": "spacing",
+      "--space-3": "spacing",
+      "--space-4": "spacing",
+      "--space-5": "spacing",
+      "--space-6": "spacing",
+      "--space-7": "spacing",
+      "--space-8": "spacing",
+      "--radius-sm": "radius",
+      "--radius-md": "radius",
+      "--radius-lg": "radius",
+      "--radius-full": "radius",
+      "--layout-mobile": "spacing",
+      "--gutter": "color",
+      "--touch-target": "spacing",
+      "--shadow-socket": "shadow",
+      "--shadow-raised": "shadow",
+      "--glow-ruby": "shadow",
+      "--glow-sapphire": "shadow",
+      "--glow-emerald": "shadow",
+      "--glow-brand": "shadow",
+      "--ring-active": "spacing",
+      "--focus-ring": "color",
+      "--focus-offset": "spacing",
+      "--motion-fast": "other",
+      "--motion-base": "other",
+      "--ease-standard": "other"
+    },
+    "fontFamilies": [
+      "Silkscreen",
+      "Space Grotesk"
+    ]
+  }
+}

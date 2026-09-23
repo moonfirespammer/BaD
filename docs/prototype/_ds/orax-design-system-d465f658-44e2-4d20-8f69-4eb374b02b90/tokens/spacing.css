@@ -1,0 +1,19 @@
+/* OraX spacing (4-based) and radius. Mobile first at 390px; page gutter is never below space-4. */
+:root{
+  --space-1:4px;
+  --space-2:8px;
+  --space-3:12px;
+  --space-4:16px;
+  --space-5:24px;
+  --space-6:32px;
+  --space-7:48px;
+  --space-8:64px;
+  --radius-sm:6px;
+  --radius-md:12px;
+  --radius-lg:22px;
+  --radius-full:999px;
+  /* Layout */
+  --layout-mobile:390px;
+  --gutter:var(--space-4);
+  --touch-target:44px;
+}

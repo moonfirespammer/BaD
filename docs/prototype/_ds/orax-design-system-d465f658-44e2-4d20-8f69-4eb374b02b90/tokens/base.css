@@ -1,0 +1,7 @@
+/* OraX base — minimal resets so tokens apply to a page that links styles.css. */
+html{background:var(--surface);color:var(--ink);font-family:var(--font-sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{margin:0;font:var(--text-body)}
+a{color:var(--brand-text);text-decoration:none}
+a:hover{color:var(--brand-text);text-decoration:underline;text-underline-offset:2px}
+:focus-visible{outline:var(--focus-ring);outline-offset:var(--focus-offset)}
+img{display:block;max-width:100%}
