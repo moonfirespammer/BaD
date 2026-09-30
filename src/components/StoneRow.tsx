@@ -1,10 +1,10 @@
 import { COPY, fill } from '@/game/content/copy';
 import type { Gem } from '@/game/types';
 import { GEMS } from '@/game/content/identity';
-import styles from './MiniStones.module.css';
+import styles from './StoneRow.module.css';
 
-/** Three 20px mini stones in a player's gem shape; lit ones get a 2px gem-fill ring and the gem SVG (spec §6). */
-export function MiniStones({ gem, stones }: { gem: Gem; stones: 0 | 1 | 2 | 3 }) {
+/** StoneRow: three 20px mini stones in a player's gem shape; lit ones get a 2px gem-fill ring and the gem SVG (spec §6). */
+export function StoneRow({ gem, stones }: { gem: Gem; stones: 0 | 1 | 2 | 3 }) {
   const shape = gem === 'ruby' ? styles.round : gem === 'sapphire' ? styles.square : styles.diamond;
   return (
     <span

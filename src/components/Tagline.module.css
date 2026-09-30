@@ -1,0 +1,21 @@
+.tagline {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.line {
+  display: block;
+}
+.md {
+  font: var(--text-tagline);
+  letter-spacing: var(--tracking-tagline);
+}
+.lg {
+  font: var(--text-tagline-lg);
+  letter-spacing: var(--tracking-tagline-lg);
+}
+.accent {
+  color: var(--brand-text);
+}

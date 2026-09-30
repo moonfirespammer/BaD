@@ -108,6 +108,65 @@ export const COPY = {
     title: 'Cursed Plates · {n}',
     caption: 'Everything the Bin refused to forget.',
   },
+  /** Spec §3.6–3.9: what the judge says. */
+  judge: {
+    emptyName: 'Empty Plate of unknown origin',
+    hint: 'meant to be {dish}',
+    air: 'You plated air. Bold. Pointless, but bold.',
+    durian: 'Durian. In {dish}. I will be filing a report.',
+    portions: '{Eight} portions of {item}. {Eight}. I counted.',
+    rawRice: 'The rice is raw. Rice is the easy part.',
+    waste: 'Something below said thank you. That is not normal.',
+    labels: {
+      clean: 'Clean plate',
+      academy: 'Academy acceptable',
+      saucy: 'Saucy but controlled',
+      bold: 'Bold but messy',
+      comforting: 'Comforting',
+      questions: 'The Bin has questions',
+      lost: 'The plate lost the argument',
+    },
+    habits: {
+      chilli: 'You doubled the chilli again · ×{n}',
+      rawRice: 'Raw rice. Again.',
+      unhinged: 'Unhinged plate ×{n} this month',
+      neat: 'Neat plater, apparently',
+      sauce: 'Sauce first, as usual',
+      new: 'A new habit is forming',
+    },
+  },
+  /** Spec §3.8: number words to twelve, numerals beyond (the prototype's table). Content, not copy. */
+  numbers: {
+    4: 'Four',
+    5: 'Five',
+    6: 'Six',
+    7: 'Seven',
+    8: 'Eight',
+    9: 'Nine',
+    10: 'Ten',
+    11: 'Eleven',
+    12: 'Twelve',
+  },
+  /** Spec §5 Verdict, §3.13. */
+  verdict: {
+    title: "The Bin's verdict",
+    cursedOverline: 'CURSED PLATE · meant to be {dish}',
+    stones: '{n} of 3 {gems}',
+    leftoversChip: 'Leftovers hour',
+    cursedChip: 'Cursed plate',
+    share: 'Share to your party',
+    setSignature: 'Set as Signature Dish',
+    signatureSet: 'Signature Dish set',
+    seeOthers: 'See who else made {dish}',
+  },
+  /** Spec §3.12, §5 Share card. */
+  share: {
+    title: 'Share card',
+    overline: '{CITY} · {date}',
+    send: 'Send to your party',
+    sent: 'Sent to your party',
+    save: 'Save image',
+  },
   /** Art placeholder captions naming each slot (kickoff prompt, Assets). RULING (prototype text) */
   art: {
     intro: ['Illustration: the city shelf', 'Illustration: three sigils', 'Illustration: the Bin'],
@@ -148,6 +207,7 @@ export const COPY = {
   /** Screen-reader labels (prototype aria-labels; the spec names none). RULING */
   a11y: {
     back: "Back to today's dishes",
+    backToVerdict: 'Back to the verdict',
     remove: 'Remove one portion',
     main: 'Main',
     intro: 'Intro',
@@ -159,6 +219,8 @@ export const COPY = {
   },
   /** Existing OraX chrome reproduced from the prototype (not Build-A-Dish copy). RULING */
   orax: {
+    /** The OraX Tagline (design-system brand component): two Silkscreen lines, the last word of each in brand-text. */
+    tagline: ['THE GAME IS LIFE', 'PLAY IT TOGETHER'],
     play: {
       notifications: 'Notifications',
       venue: { SG: 'Tiong Bahru Market', KL: 'Jalan Alor' },

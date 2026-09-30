@@ -11,12 +11,14 @@ import type {
 } from '@/game/types';
 import { DISHES, dish } from '@/game/content/dishes';
 import { STOCK0 } from '@/game/content/ingredients';
+import { applyVerdict } from '@/game/habits';
+import { judge } from '@/game/judge';
 import { canTake, type TakeResult } from '@/game/pool';
 import type { Clock } from './clock';
 import { formatDate, nextResetAt } from './clock';
 import type { Storage } from './storage';
 import type { ProfileStore } from './profile';
-import { NotImplementedError, PoolError, type PoolService } from './PoolService';
+import { PoolError, type PoolService } from './PoolService';
 import { Simulation } from './sim';
 
 /** Player-owned state for one city day; everything else is derived from the simulation. */
@@ -34,6 +36,8 @@ interface DayState {
   refused: Record<string, number>;
   /** The player's own plates and flings, added to the simulated Bin-eaten counter. */
   binEatenExtra: number;
+  /** The player's row on today's wall for the picked dish: one per player, the latest plate wins (register Q49). */
+  wallEntry: WallEntry | null;
   posts: ThreadMessage[];
 }
 
@@ -44,6 +48,7 @@ const emptyDay = (): DayState => ({
   flung: {},
   refused: {},
   binEatenExtra: 0,
+  wallEntry: null,
   posts: [],
 });
 
@@ -221,6 +226,7 @@ export class MockPoolService implements PoolService {
       // Spec §3.2: swapping clears the plate; taken portions go back to the pool (flung ones stay gone).
       day.taken = {};
       day.plate = { items: [], flair: 0, mess: 0 };
+      day.wallEntry = null; // the old dish's plate leaves the wall with the pick
       day.pick = { ...day.pick, dishId, swapsLeft: 0 };
       await this.save();
       await this.emit();
@@ -296,32 +302,70 @@ export class MockPoolService implements PoolService {
     });
   }
 
+  /** Portions (n) stay as the pool counted them; the client owns prep, flair and mess. */
+  private mergeDraft(day: DayState, plate: Plate): void {
+    const lvl = (v: number): 0 | 1 | 2 | 3 => Math.max(0, Math.min(3, Math.round(v))) as 0 | 1 | 2 | 3;
+    const client = new Map(plate.items.map((i) => [i.ingredientId, i]));
+    day.plate = {
+      items: day.plate.items.map((i) => {
+        const c = client.get(i.ingredientId);
+        return c ? { ...i, cut: lvl(c.cut), heat: lvl(c.heat) } : i;
+      }),
+      flair: Math.max(0, Math.round(plate.flair)),
+      mess: Math.max(0, Math.round(plate.mess)),
+    };
+  }
+
   saveDraft(plate: Plate): Promise<void> {
     return this.exclusive(async (day) => {
       this.picked(day);
-      const lvl = (v: number): 0 | 1 | 2 | 3 => Math.max(0, Math.min(3, Math.round(v))) as 0 | 1 | 2 | 3;
-      const client = new Map(plate.items.map((i) => [i.ingredientId, i]));
-      // Portions (n) stay as the pool counted them; the client owns prep, flair and mess.
-      day.plate = {
-        items: day.plate.items.map((i) => {
-          const c = client.get(i.ingredientId);
-          return c ? { ...i, cut: lvl(c.cut), heat: lvl(c.heat) } : i;
-        }),
-        flair: Math.max(0, Math.round(plate.flair)),
-        mess: Math.max(0, Math.round(plate.mess)),
-      };
+      this.mergeDraft(day, plate);
       await this.save();
     });
   }
 
-  plate(_plate: Plate): Promise<Verdict> {
-    return Promise.reject(new NotImplementedError('plate'));
+  /**
+   * Spec §7: the server judges (its own portions, the client's prep, flair and mess) and writes the WallEntry.
+   * Every plate counts: Bin-eaten +1, habits move, a cursed plate joins the gallery; the wall row is upserted and
+   * the plate stays for another go (register Q49 — no day lock).
+   */
+  plate(plate: Plate): Promise<Verdict> {
+    return this.exclusive(async (day) => {
+      this.picked(day);
+      if (!day.pick) throw new PoolError('not-picked', 'Pick a dish first');
+      this.mergeDraft(day, plate);
+      const d = dish(day.pick.dishId);
+      const p = this.profile.get();
+      const verdict = judge(d, day.plate, p.habits);
+      const date = formatDate(this.clock.now());
+      await this.profile.update({
+        habits: applyVerdict(p.habits, verdict),
+        cursedPlates: verdict.cursed ? [{ ...verdict, date }, ...p.cursedPlates] : p.cursedPlates,
+      });
+      day.binEatenExtra += 1;
+      day.wallEntry = {
+        playerId: p.id,
+        name: p.name,
+        classKey: p.classKey,
+        figure: p.figure,
+        gem: p.gem,
+        stones: verdict.stones,
+        variant: verdict.name,
+        style: verdict.style,
+        line: verdict.line,
+        platedAt: new Date(this.clock.now()).toISOString(),
+      };
+      await this.save();
+      await this.emit();
+      return verdict;
+    });
   }
 
   async getWall(dishId: string): Promise<WallEntry[]> {
-    await this.ensureDay();
+    const day = await this.ensureDay();
     if (!this.sim) throw new Error('no simulation');
-    return this.sim.stateAt(this.clock.city().msSinceMidnight).wall[dishId] ?? [];
+    const rows = this.sim.stateAt(this.clock.city().msSinceMidnight).wall[dishId] ?? [];
+    return day.wallEntry && day.pick?.dishId === dishId ? [...rows, day.wallEntry] : rows;
   }
 
   async getThread(dishId: string): Promise<ThreadMessage[]> {

@@ -23,6 +23,7 @@
     "check:full": "pnpm check && pnpm build && pnpm e2e"
   },
   "dependencies": {
+    "html-to-image": "1.11.13",
     "idb-keyval": "^6.3.0",
     "lucide-react": "^1.47.0",
     "react": "^19.1.1",

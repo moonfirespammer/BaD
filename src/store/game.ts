@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import type { City, DayBoard, Pick, Plate, Profile } from '@/game/types';
-import { NotImplementedError, PoolError, type PoolService } from '@/services/PoolService';
+import type { City, DayBoard, Pick, Plate, Profile, Verdict } from '@/game/types';
+import { PoolError, type PoolService } from '@/services/PoolService';
 import type { Clock } from '@/services/clock';
 import type { ProfileStore } from '@/services/profile';
 import { dish } from '@/game/content/dishes';
@@ -9,7 +9,7 @@ import { CITY_NAME } from '@/game/content/identity';
 import { COPY, fill } from '@/game/content/copy';
 import type { SigilKind } from '@/game/sigils';
 import { applySigil, flingItem, rotating } from '@/game/station';
-import { remark } from './toast';
+import { remark, useToast } from './toast';
 
 export interface GameDeps {
   city: City;
@@ -37,6 +37,10 @@ interface GameState {
   /** Session counters that drive the rotating remarks (spec §3.3 refusals, §3.4 flings). */
   refusals: number;
   flings: number;
+  /** The Bin's verdict on the last plate this session (spec §3.5–3.8); null until Plate it. */
+  verdict: Verdict | null;
+  /** Share card: `Send to your party` has been pressed for this verdict (spec §3.12). */
+  sent: boolean;
   init: (deps: GameDeps) => Promise<void>;
   dispose: () => void;
   selectDish: (dishId: string | null) => void;
@@ -45,9 +49,12 @@ interface GameState {
   tapIngredient: (ingredientId: string) => Promise<void>;
   removeIngredient: (ingredientId: string) => Promise<void>;
   selectItem: (ingredientId: string) => void;
-  stroke: (kind: SigilKind, fast: boolean) => Promise<void>;
+  /** Resolves with the verdict when the stroke plated the dish. */
+  stroke: (kind: SigilKind, fast: boolean) => Promise<Verdict | null>;
   fling: () => Promise<void>;
-  plateNow: () => Promise<void>;
+  plateNow: () => Promise<Verdict | null>;
+  setSignature: () => Promise<void>;
+  sendToParty: () => void;
   setPreferButtons: (on: boolean) => Promise<void>;
   markIntroSeen: () => Promise<void>;
   updateProfile: (patch: Partial<Profile>) => Promise<void>;
@@ -59,8 +66,9 @@ let tick: ReturnType<typeof setInterval> | null = null;
 /** Bumped by every init and dispose; an init that finds a newer generation after its awaits gives up. */
 let generation = 0;
 
-/** True while a fling is in flight, so a double tap flings once. */
+/** True while a fling or a plate is in flight, so a double tap flings, or plates, once. */
 let flinging = false;
+let plating = false;
 
 /** A refused action (already picked, no swaps left, ...) is a no-op for the player; anything else is a bug. */
 function ignorePoolError(e: unknown): void {
@@ -78,7 +86,14 @@ async function resyncDay(): Promise<void> {
     deps.service.getPlate(),
   ]);
   if (mine === generation) {
-    useGame.setState({ board, pick, plate, selectedDish: pick?.dishId ?? null, selectedIng: null });
+    useGame.setState({
+      board,
+      pick,
+      plate,
+      selectedDish: pick?.dishId ?? null,
+      selectedIng: null,
+      verdict: null,
+    });
   }
 }
 
@@ -112,6 +127,8 @@ export const useGame = create<GameState>((set, get) => ({
   flash: null,
   refusals: 0,
   flings: 0,
+  verdict: null,
+  sent: false,
   init: async (deps) => {
     get().dispose();
     const mine = ++generation;
@@ -132,6 +149,8 @@ export const useGame = create<GameState>((set, get) => ({
       busy: false,
       now: deps.clock.now(),
       ready: true,
+      verdict: null,
+      sent: false,
     });
     unsubscribe = deps.service.subscribe(deps.city, (b) => {
       const prev = get().board;
@@ -147,6 +166,7 @@ export const useGame = create<GameState>((set, get) => ({
   dispose: () => {
     generation += 1;
     flinging = false;
+    plating = false;
     unsubscribe?.();
     unsubscribeProfile?.();
     if (tick) clearInterval(tick);
@@ -176,7 +196,7 @@ export const useGame = create<GameState>((set, get) => ({
     try {
       const pick = await deps.service.swap(selectedDish);
       const plate = await deps.service.getPlate();
-      set({ pick, plate, selectedDish: pick.dishId, selectedIng: null });
+      set({ pick, plate, selectedDish: pick.dishId, selectedIng: null, verdict: null });
       remark(fill(COPY.bin.swapped, { dish: dish(pick.dishId).short.toLowerCase() }));
     } catch (e) {
       ignorePoolError(e);
@@ -231,12 +251,12 @@ export const useGame = create<GameState>((set, get) => ({
   selectItem: (ingredientId) => set({ selectedIng: ingredientId }),
   stroke: async (kind, fast) => {
     const { deps, plate, selectedIng, flash } = get();
-    if (!deps) return;
+    if (!deps) return null;
     const o = applySigil(plate, selectedIng, kind, fast);
     set({ plate: o.plate, flash: { word: o.word, seq: (flash?.seq ?? 0) + 1 } });
     if (o.remark) remark(o.remark);
     const saved = await write(() => deps.service.saveDraft(o.plate).then(() => true));
-    if (saved && o.plateNow) await get().plateNow();
+    return saved && o.plateNow ? get().plateNow() : null;
   },
   fling: async () => {
     const { deps, plate, selectedIng } = get();
@@ -256,14 +276,24 @@ export const useGame = create<GameState>((set, get) => ({
   },
   plateNow: async () => {
     const { deps, plate } = get();
-    if (!deps) return;
+    if (!deps || plating) return null;
+    plating = true;
     try {
-      await deps.service.plate(plate);
-      // Phase 3: navigate to the Verdict.
-    } catch (e) {
-      if (!(e instanceof NotImplementedError)) throw e; // the judge and the Verdict arrive in Phase 3
+      const verdict = await write(() => deps.service.plate(plate));
+      if (!verdict) return null;
+      useToast.getState().clear(); // plating clears the Bin toast (prototype)
+      set({ verdict, sent: false });
+      return verdict;
+    } finally {
+      plating = false;
     }
   },
+  setSignature: async () => {
+    const { deps, verdict } = get();
+    if (!deps || !verdict) return;
+    await deps.service.setSignature(verdict);
+  },
+  sendToParty: () => set({ sent: true }),
   setPreferButtons: async (on) => {
     const { deps } = get();
     if (!deps) return;

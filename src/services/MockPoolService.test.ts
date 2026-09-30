@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { MockPoolService } from './MockPoolService';
-import { NotImplementedError, PoolError } from './PoolService';
+import { PoolError } from './PoolService';
 import { createClock } from './clock';
 import { ProfileStore } from './profile';
 import { createMemoryStorage } from './storage';
@@ -190,6 +190,9 @@ describe('MockPoolService', () => {
       flags: { chilli: false, rawRice: false },
     });
     expect(profile.get().signature).toMatchObject({ name: 'Chicken rice', date: '23 Sep 2026' });
-    await expect(service.plate({ items: [], flair: 0, mess: 0 })).rejects.toBeInstanceOf(NotImplementedError);
+    // Plating needs a pick (spec §7: the server judges the picked dish).
+    await expect(service.plate({ items: [], flair: 0, mess: 0 })).rejects.toMatchObject({
+      code: 'not-picked',
+    });
   });
 });

@@ -9,8 +9,11 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { classify, type StrokePoint } from './sigils';
 import { applySigil } from './station';
+import { judge } from './judge';
 import { mulberry32 } from './hash';
-import type { Level, Plate } from './types';
+import { DISHES } from './content/dishes';
+import { EXTRAS } from './content/ingredients';
+import type { Level, Plate, PlateItem } from './types';
 
 const html = readFileSync(resolve(process.cwd(), 'docs/prototype/Build-A-Dish.dc.html'), 'utf8');
 const script = /<script type="text\/x-dc"[^>]*>([\s\S]*?)<\/script>/.exec(html)?.[1] ?? '';
@@ -20,9 +23,31 @@ const protoClassify = new Function(
   `${/function classify\([\s\S]*?\n}\n/.exec(script)?.[0] ?? ''}; return classify;`,
 )() as (pts: StrokePoint[], w: number) => ProtoSigil;
 
+interface ProtoVerdict {
+  key: number;
+  name: string;
+  hint: string;
+  label: string;
+  line: string;
+  stones: number;
+  score: number;
+  style: string;
+  cursed: boolean;
+  waste: boolean;
+  habit: string;
+  leftoversUsed: boolean;
+  dish: string;
+  flags: { chilli: boolean; rawRice: boolean };
+  summary: string;
+}
 interface ProtoComponent {
   state: Record<string, unknown>;
   props: Record<string, unknown>;
+  judge: (
+    dish: unknown,
+    plate: Record<string, { n: number; cut: number; heat: number }>,
+    flair: number,
+  ) => ProtoVerdict;
   fire: (g: { kind: string; fast: boolean }) => void;
   remark: (t: string) => void;
   showSigil: (t: string) => void;
@@ -30,10 +55,11 @@ interface ProtoComponent {
   splat: () => unknown;
   setState: (p: Record<string, unknown>) => void;
 }
-const makeProto = new Function(
-  `class DCLogic { constructor(){ this.props = {}; } setState(p){ this.state = { ...this.state, ...p }; } }\n${script}\nreturn () => new Component();`,
-)() as () => ProtoComponent;
+const STUB =
+  'class DCLogic { constructor(){ this.props = {}; } setState(p){ this.state = { ...this.state, ...p }; } }';
+const makeProto = new Function(`${STUB}\n${script}\nreturn () => new Component();`)() as () => ProtoComponent;
 const newProto = makeProto;
+const protoDishes = new Function(`${STUB}\n${script}\nreturn DISH_MAP;`)() as Record<string, unknown>;
 
 describe('prototype fidelity', () => {
   it('classify agrees with the prototype on 20,000 random strokes', () => {
@@ -139,5 +165,62 @@ describe('prototype fidelity', () => {
         expect({ n: i.n, cut: i.cut, heat: i.heat }, `case ${n} ${i.ingredientId}`).toEqual(p);
       }
     }
+  });
+
+  it('judge agrees with the prototype on 3,000 random plates (names, lines, labels, stones, scores, habits)', () => {
+    const rnd = mulberry32(2609);
+    let cursedSeen = 0;
+    let emptySeen = 0;
+    for (let n = 0; n < 3000; n++) {
+      const d = DISHES[Math.floor(rnd() * DISHES.length)] ?? DISHES[0];
+      if (!d) throw new Error('no dishes');
+      const pool = [...d.ingredients, ...(d.optional ?? []), ...EXTRAS].sort(() => rnd() - 0.5);
+      const items: PlateItem[] = pool
+        .filter(() => rnd() < (n % 10 === 0 ? 0.05 : 0.45))
+        .map((ingredientId) => ({
+          ingredientId,
+          n: 1 + Math.floor(rnd() * (rnd() < 0.8 ? 3 : 12)),
+          cut: Math.floor(rnd() * 4) as Level,
+          heat: Math.floor(rnd() * 4) as Level,
+        }));
+      const flair = Math.floor(rnd() * 8);
+      const counters = { chilli: Math.floor(rnd() * 5), unhinged: Math.floor(rnd() * 5) };
+      const ours = judge(d, { items, flair, mess: 0 }, counters);
+
+      const proto = newProto();
+      proto.state = { ...proto.state, history: { ...counters, rawRice: 0, plates: 0 } };
+      const theirs = proto.judge(
+        protoDishes[d.id],
+        Object.fromEntries(items.map((i) => [i.ingredientId, { n: i.n, cut: i.cut, heat: i.heat }])),
+        flair,
+      );
+      const tag = `plate ${n} (${d.id})`;
+      expect(ours.key, tag).toBe(theirs.key);
+      expect(ours.name, tag).toBe(theirs.name);
+      expect(ours.hint ?? '', tag).toBe(theirs.hint);
+      expect(ours.label, tag).toBe(theirs.label);
+      expect(ours.line, tag).toBe(theirs.line);
+      expect(ours.stones, tag).toBe(theirs.stones);
+      expect(ours.score, tag).toBe(theirs.score);
+      expect(ours.cursed, tag).toBe(theirs.cursed);
+      expect(ours.wasteLine !== undefined, tag).toBe(theirs.waste);
+      expect(ours.habit, tag).toBe(theirs.habit);
+      expect(ours.leftoversUsed, tag).toBe(theirs.leftoversUsed);
+      expect(ours.flags, tag).toEqual(theirs.flags);
+      if (items.length === 0) {
+        // Documented differences (register Q45, Q46): style `Empty` (spec) and no `Nothing on the plate` caption.
+        expect(ours.style, tag).toBe('Empty');
+        expect(theirs.style, tag).toBe('Neat');
+        expect(ours.summary, tag).toBe('');
+        expect(theirs.summary, tag).toBe('Nothing on the plate');
+        emptySeen += 1;
+      } else {
+        expect(ours.style, tag).toBe(theirs.style);
+        expect(ours.summary, tag).toBe(theirs.summary);
+      }
+      if (ours.cursed) cursedSeen += 1;
+    }
+    expect(cursedSeen).toBeGreaterThan(300);
+    expect(emptySeen).toBeGreaterThan(20);
   });
 });

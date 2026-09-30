@@ -4,7 +4,9 @@ import { Toast } from '@/components/Toast';
 import { Board } from '@/screens/Board';
 import { CursedPlates } from '@/screens/CursedPlates';
 import { Intro } from '@/screens/Intro';
+import { Share } from '@/screens/Share';
 import { Station } from '@/screens/Station';
+import { Verdict } from '@/screens/Verdict';
 import { useGame } from '@/store/game';
 import type { City } from '@/game/types';
 import type { PoolService } from '@/services/PoolService';
@@ -12,7 +14,7 @@ import type { ProfileStore } from '@/services/profile';
 import { createClock, type Clock } from '@/services/clock';
 import styles from './BuildADish.module.css';
 
-/** Screens that hide the host's tab bar (spec §5): Station, Verdict, Wall, Thread, Share. Added in Phases 2–4. */
+/** Screens that hide the host's tab bar (spec §5): Station, Verdict, Wall, Thread, Share. Wall and Thread are Phase 4. */
 const IMMERSIVE = new Set(['/station', '/verdict', '/wall', '/thread', '/share']);
 
 const defaultClock = createClock();
@@ -78,6 +80,8 @@ export function BuildADish({
           <Route path="/board" element={<Board />} />
           <Route path="/cursed" element={<CursedPlates />} />
           <Route path="/station" element={<Station />} />
+          <Route path="/verdict" element={<Verdict />} />
+          <Route path="/share" element={<Share />} />
           <Route path="*" element={<Navigate to="/board" replace />} />
         </Routes>
       </MemoryRouter>

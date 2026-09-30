@@ -7,7 +7,7 @@ import { THEMES, open, skipIntro, type Theme } from './helpers';
 const PROTOTYPE = 'http://127.0.0.1:4174/Build-A-Dish.dc.html';
 const OUT = 'e2e/__screenshots__/compare';
 
-/** Phase 1 screens: prototype jump-chip label, and how to reach the same screen in the app. */
+/** Prototype jump-chip label, and how to reach the same screen in the app. */
 const SCREENS: { name: string; chip: string; app: (page: Page) => Promise<void> }[] = [
   { name: 'intro', chip: 'Intro', app: () => Promise.resolve() },
   { name: 'board', chip: 'Board', app: skipIntro },
@@ -28,6 +28,48 @@ const SCREENS: { name: string; chip: string; app: (page: Page) => Promise<void> 
       await page.getByRole('button', { name: 'Pick chicken rice for today' }).click();
       await page.getByRole('button', { name: 'Cook chicken rice' }).click();
       await page.waitForTimeout(3000); // let the pick toast clear, as in the prototype jump
+    },
+  },
+  {
+    // The prototype's demo plate: every ingredient once, the third one ×4, the first seared.
+    name: 'verdict',
+    chip: 'Verdict',
+    app: async (page) => {
+      await skipIntro(page);
+      await page.getByRole('button', { name: /^Hainanese chicken rice/ }).click();
+      await page.getByRole('button', { name: 'Pick chicken rice for today' }).click();
+      await page.getByRole('button', { name: 'Cook chicken rice' }).click();
+      for (const id of [
+        'chicken',
+        'rice',
+        'ginger',
+        'ginger',
+        'ginger',
+        'ginger',
+        'chilli-sauce',
+        'cucumber',
+        'dark-soy',
+      ]) {
+        await page.getByTestId(`pantry-${id}`).getByRole('button').first().click();
+      }
+      await page.getByRole('button', { name: 'Plate it' }).click();
+      await page.getByRole('heading', { name: "The Bin's verdict" }).waitFor();
+    },
+  },
+  {
+    name: 'share',
+    chip: 'Share card',
+    app: async (page) => {
+      await skipIntro(page);
+      await page.getByRole('button', { name: /^Hainanese chicken rice/ }).click();
+      await page.getByRole('button', { name: 'Pick chicken rice for today' }).click();
+      await page.getByRole('button', { name: 'Cook chicken rice' }).click();
+      for (const id of ['chicken', 'rice', 'ginger', 'chilli-sauce', 'cucumber', 'dark-soy']) {
+        await page.getByTestId(`pantry-${id}`).getByRole('button').first().click();
+      }
+      await page.getByRole('button', { name: 'Plate it' }).click();
+      await page.getByRole('button', { name: 'Share to your party' }).click();
+      await page.getByRole('heading', { name: 'Share card' }).waitFor();
     },
   },
   ...(['Play', 'Classes', 'You'] as const).map((tab) => ({
@@ -74,7 +116,7 @@ async function prototypeShots(page: Page, theme: Theme): Promise<Record<string, 
 }
 
 for (const theme of THEMES) {
-  test(`prototype vs app, Phase 1 screens (${theme})`, async ({ browser }) => {
+  test(`prototype vs app, all built screens (${theme})`, async ({ browser }) => {
     test.setTimeout(240_000);
     mkdirSync(OUT, { recursive: true });
     const protoCtx = await browser.newContext({ ignoreHTTPSErrors: true, deviceScaleFactor: 1 });

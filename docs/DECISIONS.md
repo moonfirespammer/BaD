@@ -63,6 +63,8 @@ Leftovers hour lifts the cap above 25 (plenty and moderate), per spec §3.3.
 | `Profile` | `preferButtons?: boolean` (Phase 2) | Spec §10 "Prefer buttons" setting (Cut and Heat buttons under the pad). |
 | `<Art>` | `placeholder: 'box' \| 'blob'` (Phase 2) | Mess splats go through Art (slot `mess`, `splat-1…4`) with the spec's blob as the stand-in. |
 | `PoolError` | code `'not-on-plate'` (Phase 2 review) | A fling of an ingredient no longer on the plate (double tap) is refused instead of adding mess. |
+| `judge(dish, plate, habits)` | third argument (Phase 3) | The habit line carries the post-increment counter (spec §3.9), so the pure judge takes the current counters as input (register Q52). |
+| `DayState.wallEntry` (mock, internal) | the player's WallEntry for the day (Phase 3) | `plate()` writes the WallEntry (spec §7); the mock keeps one per player and returns it from `getWall`. |
 
 ## Stack deviations
 
@@ -103,4 +105,23 @@ These follow the questions register's literal readings; each is listed in the Ph
 - **Splats** follow the prototype (10–22px wide and tall drawn separately, blob radius `40% 60% 55% 45%`, placed by their top-left corner at left 12–88 %), except top is 18–60 % instead of 18–78 %: the spec's pad hint needs two lines, and a blob under it drops that text to about 3:1 (visual deviation).
 - **Kept as the prototype has it** (reviewed, not changed): the shared header measures 61px (the prototype's 56px is a min-height); Pantry names use the prototype's 20px leading; below 360px some names break mid-word and `Running low` touches the minus button.
 - **Plate card height** (ruling Q1 above): reserved rows instead of the prototype's growing card.
+
+## Phase 3 (Verdict) — defaults taken where the spec is silent or ambiguous
+
+These follow the questions register's literal readings (register Q45–Q60, Q03, Q20, Q23, X09); each is listed in the Phase 3 report for the owner.
+
+- **Judge**: a byte-for-byte port of the prototype's `judge()` (score terms, order, stones, label, line priority, hash picks). Two documented departures where the spec wins: style is `Empty` for a plate with nothing on it (register Q45), and the summary caption is the ` · `-joined item list — empty, and not rendered, for an empty plate; no `Nothing on the plate` (register Q46).
+- **Namer**: seed = FNV-1a of `{id}{n}{cut}{heat}|…` + dishId over the items in first-add order, as the prototype (register Q50). Items are not sorted, so tap order is part of the seed and two identical plates built in different orders can get different cursed names and hash-picked lines.
+- **Habits** (register Q52, Q53): `judge(dish, plate, habits)` takes the current counters and the habit line shows counter + 1; every applicable counter moves on every plate (`plates` always, `chilli`, `rawRice`, `unhinged` from the plate's own flags); counters are month-scoped (Phase 1).
+- **Plating** (register Q49): no day lock. The plate stays after the Verdict (`Cook {dish}` reopens it), re-plating is allowed, and every `plate()` bumps Bin-eaten, `habits.plates` and (when cursed) the gallery. The player's wall row is one per dish per day, the latest plate wins; a swap removes it and clears the verdict.
+- **Bin line and chips** (register Q56, Q58): the 2-stone line `The rice is doing all the work here.` is picked by hash for any dish; the judge has no clock — the `Leftovers hour` chip means any item above 3 portions; `I am counting.` (Station toast) and `I counted.` (verdict) stay two strings; flair caps at +10 only inside the judge (register Q59).
+- **Stones caption** always plural: `{n} of 3 rubies` / `sapphires` / `emeralds` (register Q48).
+- **No Bin toasts** on Set as Signature Dish, Send to your party or Save image — the buttons change state only (register Q47; the prototype's three lines are listed under Questions).
+- **Dates** (register Q54): `d Mon yyyy` in city time for the gallery, the Signature Dish and the Share card; never `Today`.
+- **Cursed Plates** (register Q55): `{n}` is the player's all-time count; an empty gallery is blank; three mini stones with one lit.
+- **Share screen** (register Q57): a 56px header with a 44px back button (`Back to the verdict`, the prototype's label) and the title `Share card`; the card is 326px; `Save image` renders the card's DOM to a 2× PNG with html-to-image after the fonts have loaded (register Q60) and offers `build-a-dish-{yyyy-mm-dd}.png`.
+- **Routes** (register Q03): Verdict × → Board; Share back → Verdict; `See who else made {dish}` → the wall, which is Phase 4 — until then it lands on the Board.
+- **Bin pose** by verdict through Art (kickoff follow-up prompt): 3 stones `approving`, 2 `judging`, 1 `neutral`, cursed `disgusted`; the cursed render key is the Base word (`empty` for a plate of air). No dish render on the Verdict (spec §5 lists only the Bin slot; the asset brief's "up to 200px on the verdict" is listed under Questions).
+- **StoneRow**: the Phase 1 `MiniStones` component is renamed to the kickoff's `StoneRow`.
+- **Plating clears the Bin toast** (prototype) and a double tap on Plate it plates once.
 

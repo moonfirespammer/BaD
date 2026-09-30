@@ -3,7 +3,7 @@ import { Avatar } from '@/components/Avatar';
 import { Button } from '@/components/Button';
 import { Chip } from '@/components/Chip';
 import { Icon } from '@/components/Icon';
-import { MiniStones } from '@/components/MiniStones';
+import { StoneRow } from '@/components/StoneRow';
 import { COPY, fill } from '@/game/content/copy';
 import { CITY_NAME, CLASSES, GEMS } from '@/game/content/identity';
 import { useGame } from '@/store/game';
@@ -69,7 +69,7 @@ export function You() {
                 {sig.label} · {sig.date}
               </div>
               <div className={styles.sigStones}>
-                <MiniStones gem={profile.gem} stones={sig.stones} />
+                <StoneRow gem={profile.gem} stones={sig.stones} />
               </div>
             </div>
           </div>

@@ -1,13 +1,12 @@
 import { useNavigate } from 'react-router';
 import { Art } from '@/components/Art';
 import { Icon } from '@/components/Icon';
-import { MiniStones } from '@/components/MiniStones';
+import { StoneRow } from '@/components/StoneRow';
 import { COPY, fill } from '@/game/content/copy';
+import { cursedRenderKey } from '@/game/namer';
 import { useGame } from '@/store/game';
 import s from './screens.module.css';
 import styles from './CursedPlates.module.css';
-
-const baseWord = (name: string): string => name.split(' ')[1]?.toLowerCase() ?? 'plate';
 
 /** Cursed Plates (spec §3.11, §5): the player's own cursed plates, newest first. Empty on a fresh profile. */
 export function CursedPlates() {
@@ -37,7 +36,7 @@ export function CursedPlates() {
             <div key={`${v.key}-${i}`} className={`${s.card} ${styles.card}`}>
               <Art
                 slot="cursed"
-                id={baseWord(v.name)}
+                id={cursedRenderKey(v.name)}
                 size={{ width: '100%', height: 96 }}
                 radius="sm"
                 caption={COPY.art.render}
@@ -47,7 +46,7 @@ export function CursedPlates() {
                 {v.hint} · {v.date}
               </div>
               <div className={s.caption}>{v.line}</div>
-              <MiniStones gem={profile.gem} stones={1} />
+              <StoneRow gem={profile.gem} stones={1} />
             </div>
           ))}
         </div>

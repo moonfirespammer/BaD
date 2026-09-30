@@ -1,0 +1,67 @@
+.title {
+  flex: 1;
+}
+.scroll {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: var(--space-4);
+}
+.card {
+  width: 326px;
+  max-width: 100%;
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.pixel {
+  color: var(--ink-muted);
+}
+.name {
+  margin: 0;
+  font: var(--text-heading-md);
+  letter-spacing: var(--tracking-heading-md);
+  text-wrap: pretty;
+}
+.line {
+  margin: 0;
+  font: var(--text-body);
+  color: var(--ink-muted);
+  text-wrap: pretty;
+}
+.stones {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.me {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border);
+}
+.meText {
+  flex: 1;
+  min-width: 0;
+}
+.meName {
+  font: var(--text-body-strong);
+}
+.meClass {
+  font: var(--text-caption);
+  font-weight: 500;
+}
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}

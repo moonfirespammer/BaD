@@ -108,10 +108,14 @@ test.describe('Phase 2: Station', () => {
     await expect(chip(page, /^Ginger sauce ×/)).toHaveCount(0);
     await expect(page.getByText('MESS ×1 · SWEEP TO WIPE')).toBeVisible();
 
+    // PLATE by flick, and by the button: both open the Verdict (Phase 3), and the plate stays for another go.
     await draw(page, flick, 3);
-    await expect(word(page)).toHaveText('PLATE');
+    await expect(page.getByRole('heading', { name: "The Bin's verdict" })).toBeVisible();
+    await page.getByRole('button', { name: "Back to today's dishes" }).click();
+    await page.getByRole('button', { name: 'Cook chicken rice' }).click();
+    await expect(chip(page, /^Poached chicken ×1/)).toContainText('burnt');
     await page.getByRole('button', { name: 'Plate it' }).click();
-    await expect(word(page)).toHaveText('PLATE');
+    await expect(page.getByRole('heading', { name: "The Bin's verdict" })).toBeVisible();
 
     // The plate survives leaving, and a reload.
     await page.getByRole('button', { name: "Back to today's dishes" }).click();
@@ -176,7 +180,7 @@ test.describe('Phase 2: Station', () => {
     await expect(tap(page, 'rice')).toBeFocused();
     await page.getByRole('button', { name: 'Plate it' }).focus();
     await page.keyboard.press('Enter');
-    await expect(word(page)).toHaveText('PLATE');
+    await expect(page.getByRole('heading', { name: "The Bin's verdict" })).toBeVisible();
     await page.reload();
     await page.getByRole('button', { name: 'Cook chicken rice' }).click();
     await expect(page.getByRole('button', { name: 'Heat', exact: true })).toBeVisible(); // the setting persists
@@ -243,12 +247,12 @@ for (const theme of THEMES) {
     await expect(chip(page, /^Poached chicken ×1/)).toContainText('cooked');
     for (let i = 0; i < 2; i++) await draw(page, spiral(), 4);
     await expect(chip(page, /^Poached chicken ×1/)).toContainText('burnt');
-    await draw(page, flick, 3);
-    await expect(word(page)).toHaveText('PLATE');
     await page.getByRole('switch', { name: 'Prefer buttons' }).click();
     await expect(page.getByRole('button', { name: 'Heat', exact: true })).toBeVisible();
     await expectNoAxeViolations(page, `station built ${theme}`);
     await expectHitTargets(page, `station built ${theme}`);
     await shot(page, `station-built-${theme}`);
+    await draw(page, flick, 3); // flick → PLATE → the Verdict (Phase 3)
+    await expect(page.getByRole('heading', { name: "The Bin's verdict" })).toBeVisible();
   });
 }

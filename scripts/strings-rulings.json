@@ -46,5 +46,14 @@
   "sapphires": "Plural for `{n} of 3 rubies` with a Sapphire player (spec §3.5: stones in the player's own gem)",
   "emeralds": "Plural for `{n} of 3 rubies` with an Emerald player (spec §3.5: stones in the player's own gem)",
   "OraX": "Logo alt text: the brand name",
-  "No cap on anything the city still has plenty of.": "Spec §5 gives the Station's Leftovers banner a caption with no text; prototype Station caption"
+  "No cap on anything the city still has plenty of.": "Spec §5 gives the Station's Leftovers banner a caption with no text; prototype Station caption",
+  "Back to the verdict": "Prototype aria-label for the Share card back button (Phase 3)",
+  "THE GAME IS LIFE": "OraX brand tagline (design-system Tagline component on the Share card)",
+  "PLAY IT TOGETHER": "OraX brand tagline (design-system Tagline component on the Share card)",
+  "Four": "Spec §3.8: number words to twelve for the portions line (the spec spells out only Eight and Ten)",
+  "Six": "Spec §3.8: number words to twelve for the portions line (the spec spells out only Eight and Ten)",
+  "Seven": "Spec §3.8: number words to twelve for the portions line (the spec spells out only Eight and Ten)",
+  "Nine": "Spec §3.8: number words to twelve for the portions line (the spec spells out only Eight and Ten)",
+  "Eleven": "Spec §3.8: number words to twelve for the portions line (the spec spells out only Eight and Ten)",
+  "Twelve": "Spec §3.8: number words to twelve for the portions line (the spec spells out only Eight and Ten)"
 }

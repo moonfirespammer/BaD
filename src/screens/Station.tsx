@@ -10,6 +10,7 @@ import { COPY, fill } from '@/game/content/copy';
 import { EXTRAS, ingredient } from '@/game/content/ingredients';
 import { CITY_NAME } from '@/game/content/identity';
 import { portionStyle, prepText, styleWord } from '@/game/station';
+import type { Verdict } from '@/game/types';
 import { useGame } from '@/store/game';
 import s from './screens.module.css';
 import styles from './Station.module.css';
@@ -52,6 +53,10 @@ export function Station() {
   );
   const items = plate.items.filter((i) => i.n > 0);
   const selectedItem = items.find((i) => i.ingredientId === selectedIng);
+  /** A stroke or Plate it that plated the dish opens the Verdict. */
+  const plated = (v: Verdict | null): void => {
+    if (v) void navigate('/verdict');
+  };
   const [applyPre, applyPost] = COPY.station.strokesApply.split('{item}');
 
   return (
@@ -136,7 +141,11 @@ export function Station() {
           </div>
         </section>
 
-        <SigilPad mess={plate.mess} flash={flash} onSigil={(sig) => void g.stroke(sig.kind, sig.fast)} />
+        <SigilPad
+          mess={plate.mess}
+          flash={flash}
+          onSigil={(sig) => void g.stroke(sig.kind, sig.fast).then(plated)}
+        />
         <div className={styles.buttonsRow}>
           {preferButtons ? (
             <div className={styles.prepButtons}>
@@ -178,7 +187,7 @@ export function Station() {
       </div>
 
       <div className={`${s.cta} ${styles.footer}`}>
-        <Button block onClick={() => void g.stroke('plate', false)}>
+        <Button block onClick={() => void g.stroke('plate', false).then(plated)}>
           {COPY.station.plateIt}
         </Button>
         <p className={`${s.caption} ${styles.plateHint}`}>{COPY.station.plateHint}</p>

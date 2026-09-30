@@ -34,7 +34,15 @@ const note = (s, where, kind) => {
 // 1. Copy table.
 const { COPY } = await load('src/game/content/copy.ts');
 // The namer's word lists and the tab names are listed in the spec's prose (§3.6, §1), not as quoted spans.
-const CONTENT_PATHS = ['namer.tones', 'namer.bases', 'namer.details', 'app.tabs', 'prep.', 'sigils.'];
+const CONTENT_PATHS = [
+  'namer.tones',
+  'namer.bases',
+  'namer.details',
+  'app.tabs',
+  'prep.',
+  'sigils.',
+  'numbers.',
+];
 const walkValues = (v, path) =>
   typeof v === 'string'
     ? note(v, 'src/game/content/copy.ts', CONTENT_PATHS.some((p) => path.startsWith(p)) ? 'content' : 'copy')

@@ -138,12 +138,13 @@ describe('Station store actions', () => {
     expect(g().flash).toEqual({ word: 'CLEAN', seq: seq + 1 });
   });
 
-  it('PLATE flashes and tries to plate; until Phase 3 the judge is missing and nothing else happens', async () => {
+  it('PLATE flashes and plates: the verdict comes back; a service failure still surfaces', async () => {
     const deps = await boot();
     const plate = vi.spyOn(deps.service, 'plate');
-    await g().stroke('plate', false);
+    const v = await g().stroke('plate', false);
     expect(g().flash?.word).toBe('PLATE');
     expect(plate).toHaveBeenCalledTimes(1);
+    expect(v?.name).toBe('Empty Plate of unknown origin');
     vi.spyOn(deps.service, 'plate').mockRejectedValueOnce(new Error('boom'));
     await expect(g().plateNow()).rejects.toThrow('boom');
   });

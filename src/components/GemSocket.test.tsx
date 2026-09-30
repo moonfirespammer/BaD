@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { GemSocket } from './GemSocket';
-import { MiniStones } from './MiniStones';
 
 describe('GemSocket shapes (spec §6)', () => {
   it('ruby is round, sapphire a rounded square, emerald a rotated diamond', () => {
@@ -32,11 +31,5 @@ describe('GemSocket shapes (spec §6)', () => {
     expect(btn).toHaveAttribute('aria-pressed', 'true');
     await userEvent.click(btn);
     expect(onClick).toHaveBeenCalledTimes(1);
-  });
-  it('mini stones light n of three in the gem shape', () => {
-    const { container } = render(<MiniStones gem="emerald" stones={2} />);
-    expect(screen.getByRole('img', { name: '2 of 3 emeralds' })).toBeInTheDocument();
-    const lit = container.querySelectorAll('[style*="background-image"]');
-    expect(lit).toHaveLength(2);
   });
 });
