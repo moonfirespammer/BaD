@@ -40,14 +40,28 @@
   color: var(--ink);
   text-align: right;
 }
-.empty {
-  margin-top: var(--space-2);
-}
+/* Owner ruling (Phase 2 review): the plate card keeps one height. The chips row is a fixed-height sideways scroller
+   (the empty caption sits in it), and the apply row keeps its 36px whether or not an item is selected. */
 .chips {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  align-items: center;
   gap: var(--space-2);
   margin-top: var(--space-2);
+  /* One chip's height: body-strong (22px) over caption (18px) lines, plus the chip's padding and border. */
+  min-height: calc(22px + 18px + 2 * var(--space-1) + 2px);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.chips::-webkit-scrollbar {
+  display: none;
+}
+.chips > * {
+  flex: none;
+}
+.empty {
+  margin: 0;
 }
 .applyRow {
   display: flex;
@@ -55,6 +69,7 @@
   justify-content: space-between;
   gap: var(--space-2);
   margin-top: var(--space-2);
+  min-height: 36px;
 }
 .applyName {
   color: var(--ink);

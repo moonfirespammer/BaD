@@ -23,6 +23,16 @@ owner rulings are cited as "ruling Qn" and items of the questions register as "r
 | Q13 | Card borders | Spec: 1px `--border`, 2px `--brand` when selected. |
 | Q14 | Data-model additions | Allowed, reported (below). |
 
+## Owner rulings — Phase 2 review (30 Sep 2026)
+
+| # | Question | Ruling |
+| --- | --- | --- |
+| Q1 | Plate card grows on the first add, so repeat taps land on the wrong Pantry card | Fix it: the card keeps one height. The chips scroll sideways in a fixed-height row and the `Strokes apply to` row is always reserved (a visible deviation from the prototype). |
+| Q2 | Cap refusal in Leftovers hour says "Come back at leftovers hour" under the Leftovers banner | Use only `The whole city eats from this shelf. Three.` during Leftovers hour; the rotation counter is untouched. |
+| Q3 | Slow spiral may read as CUT on high-rate touchscreens (sub-2px steps add no turning) | Fold pointer steps under 2px into the next one in the pad. The classifier stays as the prototype has it. Still to be tried on a real phone. |
+| Q4 | Rate limits on take/return | Deferred to the real backend (Phase 4+). |
+| a–o | Phase 2 defaults listed in the Phase 2 report | All accepted as built. |
+
 ## Owner decisions — Phase 1 review (23 Sep 2026)
 
 1. **Morning stock**: every shelf starts the day above 25, so shelves run out only through play (the prototype's table was a mid-day snapshot with cucumber and roti at 0).
@@ -92,4 +102,5 @@ These follow the questions register's literal readings; each is listed in the Ph
 - **Morning stock vs the prototype's table** (owner decision 1; spec §3.3 for extras): chicken 22→60, cucumber 0→58, parsley 31→44, parmesan 14→36, mutton 36→56, coriander 19→38, roti 0→40, sambal 29→48, egg 11→40, fish 24→60; the four extras (chilli padi 81, durian 97, cheddar 74, ice cream 16) → 186 each, twice the largest required shelf ("extras at 2×"). Only counts of 25 or less ever show, so none of this is visible until a shelf runs low.
 - **Splats** follow the prototype (10–22px wide and tall drawn separately, blob radius `40% 60% 55% 45%`, placed by their top-left corner at left 12–88 %), except top is 18–60 % instead of 18–78 %: the spec's pad hint needs two lines, and a blob under it drops that text to about 3:1 (visual deviation).
 - **Kept as the prototype has it** (reviewed, not changed): the shared header measures 61px (the prototype's 56px is a min-height); Pantry names use the prototype's 20px leading; below 360px some names break mid-word and `Running low` touches the minus button.
+- **Plate card height** (ruling Q1 above): reserved rows instead of the prototype's growing card.
 

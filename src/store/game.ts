@@ -193,7 +193,11 @@ export const useGame = create<GameState>((set, get) => ({
     if (!r) return;
     if (!r.ok) {
       if (r.reason === 'gone') remark(fill(COPY.bin.gone, { City: CITY_NAME[deps.city] }));
-      else {
+      else if (get().board?.leftoversHour) {
+        // Owner ruling (Phase 2 review): a Running-low shelf keeps its cap in Leftovers hour, and the Bin uses the
+        // one cap line that does not point at Leftovers hour. The rotation counter is left alone.
+        remark(COPY.bin.cap[1]);
+      } else {
         const n = get().refusals;
         set({ refusals: n + 1 });
         remark(rotating(COPY.bin.cap, n));

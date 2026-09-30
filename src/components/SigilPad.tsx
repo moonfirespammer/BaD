@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type PointerEvent } from 'react';
 import { Art } from './Art';
 import { COPY, fill } from '@/game/content/copy';
-import { classify, strokePath, type Sigil, type StrokePoint } from '@/game/sigils';
+import { MIN_SEGMENT, classify, strokePath, type Sigil, type StrokePoint } from '@/game/sigils';
 import { splat } from '@/game/station';
 import styles from './SigilPad.module.css';
 
@@ -63,7 +63,12 @@ export function SigilPad({ mess, flash, onSigil }: SigilPadProps) {
   };
   const move = (e: PointerEvent<HTMLDivElement>): void => {
     if (!drawing.current || !e.isPrimary) return;
-    pts.current.push(point(e));
+    const p = point(e);
+    const last = pts.current[pts.current.length - 1];
+    // Owner ruling (Phase 2 review): a step under 2px (high-rate touchscreens sampling a slow finger) is folded into
+    // the next one, so a slow spiral keeps its turning. The classifier itself is untouched.
+    if (last && Math.hypot(p.x - last.x, p.y - last.y) < MIN_SEGMENT) return;
+    pts.current.push(p);
     setTrail(strokePath(pts.current));
   };
   const up = (e: PointerEvent<HTMLDivElement>): void => {

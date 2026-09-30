@@ -69,8 +69,11 @@ test.describe('Phase 2: Station', () => {
     await expect(page.getByText('EMPTY · FLAIR ×0')).toBeVisible();
     await expect(page.getByText(/^RESETS 1[34]:\d\d:\d\d$/)).toBeVisible();
 
+    const emptyHeight = (await page.getByRole('region', { name: 'YOUR PLATE' }).boundingBox())?.height;
     for (let i = 0; i < 3; i++) await tap(page, 'ginger').click();
     await expect(chip(page, /^Ginger sauce ×3/)).toBeVisible();
+    // Owner ruling (Phase 2 review): the plate card keeps one height, so repeat taps land on the same card.
+    expect((await page.getByRole('region', { name: 'YOUR PLATE' }).boundingBox())?.height).toBe(emptyHeight);
     await tap(page, 'ginger').click();
     await expect(toast(page)).toContainText('Three is plenty. Come back at leftovers hour.');
     await page
@@ -138,7 +141,8 @@ test.describe('Phase 2: Station', () => {
     await expect(page.getByTestId('pantry-cucumber').getByText('Running low')).toBeVisible();
     for (let i = 0; i < 4; i++) await tap(page, 'cucumber').click();
     await expect(chip(page, /^Cucumber ×3/)).toBeVisible();
-    await expect(toast(page)).toContainText('Three is plenty. Come back at leftovers hour.');
+    // Owner ruling (Phase 2 review): in Leftovers hour the refusal never points at Leftovers hour.
+    await expect(toast(page)).toContainText('The whole city eats from this shelf. Three.');
     await shot(page, 'station-leftovers-dark');
   });
 

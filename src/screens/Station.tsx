@@ -94,40 +94,46 @@ export function Station() {
               {fill(COPY.station.plateLabel, { STYLE: styleWord(portionStyle(items, d)), n: plate.flair })}
             </span>
           </div>
-          {items.length === 0 ? <p className={`${s.caption} ${styles.empty}`}>{COPY.station.empty}</p> : null}
-          {/* The chips row is always there (empty on an empty plate), as the prototype, so the card keeps its height. */}
-          <div className={styles.chips}>
-            {items.map((i) => (
-              <PlateChip
-                key={i.ingredientId}
-                name={ingredient(i.ingredientId).name}
-                n={i.n}
-                prep={prepText(i, true)}
-                selected={selectedIng === i.ingredientId}
-                onSelect={() => g.selectItem(i.ingredientId)}
-              />
-            ))}
+          {/* Owner ruling (Phase 2 review): the card never changes height, so repeat taps land on the same Pantry
+              card. The chips scroll sideways in a fixed-height row, and the apply row is always reserved. */}
+          <div className={styles.chips} data-testid="plate-chips">
+            {items.length === 0 ? (
+              <p className={`${s.caption} ${styles.empty}`}>{COPY.station.empty}</p>
+            ) : (
+              items.map((i) => (
+                <PlateChip
+                  key={i.ingredientId}
+                  name={ingredient(i.ingredientId).name}
+                  n={i.n}
+                  prep={prepText(i, true)}
+                  selected={selectedIng === i.ingredientId}
+                  onSelect={() => g.selectItem(i.ingredientId)}
+                />
+              ))
+            )}
           </div>
-          {selectedItem ? (
-            <div className={styles.applyRow}>
-              <span className={s.caption}>
-                {applyPre}
-                <strong className={styles.applyName}>{ingredient(selectedItem.ingredientId).name}</strong>
-                {applyPost}
-              </span>
-              <button
-                type="button"
-                className={styles.fling}
-                onClick={(e) => {
-                  // Flinging unmounts this button: keep a keyboard user's place on the plate (detail 0 = key press).
-                  if (e.detail === 0) plateCard.current?.focus();
-                  void g.fling();
-                }}
-              >
-                {COPY.station.fling}
-              </button>
-            </div>
-          ) : null}
+          <div className={styles.applyRow}>
+            {selectedItem ? (
+              <>
+                <span className={s.caption}>
+                  {applyPre}
+                  <strong className={styles.applyName}>{ingredient(selectedItem.ingredientId).name}</strong>
+                  {applyPost}
+                </span>
+                <button
+                  type="button"
+                  className={styles.fling}
+                  onClick={(e) => {
+                    // Flinging unmounts this button: keep a keyboard user's place on the plate (detail 0 = key press).
+                    if (e.detail === 0) plateCard.current?.focus();
+                    void g.fling();
+                  }}
+                >
+                  {COPY.station.fling}
+                </button>
+              </>
+            ) : null}
+          </div>
         </section>
 
         <SigilPad mess={plate.mess} flash={flash} onSigil={(sig) => void g.stroke(sig.kind, sig.fast)} />

@@ -87,6 +87,22 @@ describe('Station store actions', () => {
     ]);
   });
 
+  it('Leftovers hour: a Running-low shelf keeps its cap, refused with the one neutral line (owner ruling)', async () => {
+    await boot('2026-09-23T21:30:00'); // cucumber is Running low by then
+    const { remarks, off } = listen();
+    for (let i = 0; i < 5; i++) {
+      await g().tapIngredient('cucumber');
+      useToast.getState().clear();
+    }
+    off();
+    expect(n('cucumber')).toBe(3);
+    expect(remarks).toEqual([
+      'The whole city eats from this shelf. Three.',
+      'The whole city eats from this shelf. Three.',
+    ]);
+    expect(g().refusals).toBe(0); // the rotation counter is left alone
+  });
+
   it('minus removes one portion and drops the chip at zero', async () => {
     await boot();
     await g().tapIngredient('ginger');

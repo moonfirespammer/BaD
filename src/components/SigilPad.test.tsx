@@ -101,6 +101,23 @@ describe('SigilPad', () => {
     expect(screen.queryByTestId('sigil-word')).not.toBeInTheDocument();
   });
 
+  it('folds sub-2px steps so a slow spiral on a high-rate touchscreen still reads as HEAT (owner ruling)', () => {
+    const onSigil = vi.fn();
+    render(<SigilPad mess={0} flash={null} onSigil={onSigil} />);
+    const pad = screen.getByTestId('sigil-pad');
+    // Three turns sampled every ~0.9px: every raw step is under the classifier's 2px floor.
+    const steps = 600;
+    const pts: [number, number, number][] = Array.from({ length: steps + 1 }, (_, i) => {
+      const a = (i / steps) * 3 * 2 * Math.PI;
+      const r = 8 + (42 * i) / steps;
+      return [180 + r * Math.cos(a), 75 + r * Math.sin(a), i * 4];
+    });
+    drawOn(pad, pts);
+    expect(onSigil).toHaveBeenCalledWith(expect.objectContaining({ kind: 'heat' }));
+    const kept = (pad.querySelector('path')?.getAttribute('d') ?? '').split(' L').length;
+    expect(kept).toBeLessThan(steps / 2); // the trail keeps the folded points only
+  });
+
   it('draws with one finger only: a second finger (pinch, resting thumb) is ignored', () => {
     const onSigil = vi.fn();
     render(<SigilPad mess={0} flash={null} onSigil={onSigil} />);
