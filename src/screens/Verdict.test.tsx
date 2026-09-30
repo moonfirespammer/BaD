@@ -49,8 +49,12 @@ describe('Verdict screen (spec §5 Verdict, §3.13)', () => {
     expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('Chicken rice, missing something');
     expect(screen.getByText('The plate lost the argument')).toBeInTheDocument();
     expect(screen.getByText('Poached chicken ×1')).toBeInTheDocument();
-    expect(screen.getAllByRole('img', { name: 'Ruby gem, active' })).toHaveLength(1);
-    expect(screen.getAllByRole('img', { name: 'Ruby gem' })).toHaveLength(2);
+    // The stones are one statement for assistive tech: the caption; the sockets themselves are decorative.
+    expect(screen.queryByRole('img', { name: /Ruby gem/ })).not.toBeInTheDocument();
+    expect(container.querySelectorAll('[data-testid="verdict-stones"] [data-active="true"]')).toHaveLength(1);
+    expect(container.querySelectorAll('[data-testid="verdict-stones"] [data-active="false"]')).toHaveLength(
+      2,
+    );
     expect(screen.getByText('1 of 3 rubies')).toBeInTheDocument();
     expect(screen.getByText('Neat')).toBeInTheDocument();
     expect(screen.getByText('A new habit is forming')).toBeInTheDocument();
@@ -65,8 +69,20 @@ describe('Verdict screen (spec §5 Verdict, §3.13)', () => {
     const user = userEvent.setup();
     await boot(['chicken']);
     await user.click(screen.getByRole('button', { name: 'Set as Signature Dish' }));
-    expect(await screen.findByRole('button', { name: 'Signature Dish set' })).toBeDisabled();
+    const set = await screen.findByRole('button', { name: 'Signature Dish set' });
+    expect(set).toHaveAttribute('aria-disabled', 'true'); // done, but it keeps focus and announces its label
+    expect(set).toHaveAttribute('aria-live', 'polite');
+    await user.click(set);
+    expect(useGame.getState().profile?.habits.plates).toBe(1); // a press on the done button does nothing
     expect(useGame.getState().profile?.signature?.key).toBe(useGame.getState().verdict?.key);
+    // The same plate judged higher (flair lifts the stones) is a different verdict: it may replace the signature.
+    act(() => {
+      const v = useGame.getState().verdict;
+      if (v) useGame.setState({ verdict: { ...v, stones: 2, label: 'Comforting' } });
+    });
+    expect(screen.getByRole('button', { name: 'Set as Signature Dish' })).not.toHaveAttribute(
+      'aria-disabled',
+    );
     await user.click(screen.getByRole('button', { name: 'See who else made chicken rice' }));
     expect(screen.getByText('wall here')).toBeInTheDocument();
   });

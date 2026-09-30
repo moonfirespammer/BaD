@@ -9,6 +9,7 @@ import { dish, dishLower } from '@/game/content/dishes';
 import { CITY_NAME, GEMS } from '@/game/content/identity';
 import { styleWord } from '@/game/station';
 import type { Verdict as VerdictModel } from '@/game/types';
+import { formatDate } from '@/services/clock';
 import { useGame } from '@/store/game';
 import s from './screens.module.css';
 import styles from './Verdict.module.css';
@@ -31,8 +32,15 @@ export function Verdict() {
   if (!verdict || pick?.dishId !== verdict.dishId) return <Navigate to="/board" replace />;
   const d = dish(verdict.dishId);
   const lower = dishLower(d);
+  // "Signature Dish set" means this very verdict: the same plate on the same dish today, judged the same way (flair
+  // can lift the same plate to more stones, and that plate may replace the earlier one).
   const sig = profile.signature;
-  const isSignature = sig?.key === verdict.key && sig.dishId === verdict.dishId;
+  const isSignature =
+    sig?.key === verdict.key &&
+    sig.dishId === verdict.dishId &&
+    sig.stones === verdict.stones &&
+    sig.label === verdict.label &&
+    sig.date === formatDate(deps.clock.now());
   const gem = GEMS[profile.gem];
 
   return (
@@ -73,9 +81,9 @@ export function Verdict() {
         </div>
 
         <div className={styles.stones}>
-          <div className={styles.sockets} data-testid="verdict-stones">
+          <div className={styles.sockets} data-testid="verdict-stones" aria-hidden="true">
             {[1, 2, 3].map((k) => (
-              <GemSocket key={k} gem={profile.gem} active={k <= verdict.stones} size={56} />
+              <GemSocket key={k} gem={profile.gem} active={k <= verdict.stones} size={56} decorative />
             ))}
           </div>
           <span className={s.caption}>
@@ -83,22 +91,32 @@ export function Verdict() {
           </span>
         </div>
 
-        <div className={styles.chips}>
-          <Chip appearance="subtle">{styleWord(verdict.style)}</Chip>
-          <Chip appearance="subtle">{verdict.habit}</Chip>
-          {verdict.leftoversUsed ? <Chip appearance="subtle">{COPY.verdict.leftoversChip}</Chip> : null}
-          {verdict.cursed ? (
-            <Chip variant="ruby" appearance="outline">
-              {COPY.verdict.cursedChip}
-            </Chip>
+        <ul className={styles.chips}>
+          <li>
+            <Chip appearance="subtle">{styleWord(verdict.style)}</Chip>
+          </li>
+          <li>
+            <Chip appearance="subtle">{verdict.habit}</Chip>
+          </li>
+          {verdict.leftoversUsed ? (
+            <li>
+              <Chip appearance="subtle">{COPY.verdict.leftoversChip}</Chip>
+            </li>
           ) : null}
-        </div>
+          {verdict.cursed ? (
+            <li>
+              <Chip variant="ruby" appearance="outline">
+                {COPY.verdict.cursedChip}
+              </Chip>
+            </li>
+          ) : null}
+        </ul>
 
         <div className={styles.actions}>
           <Button block onClick={() => void navigate('/share')}>
             {COPY.verdict.share}
           </Button>
-          <Button variant="secondary" block disabled={isSignature} onClick={() => void setSignature()}>
+          <Button variant="secondary" block done={isSignature} onClick={() => void setSignature()}>
             {isSignature ? COPY.verdict.signatureSet : COPY.verdict.setSignature}
           </Button>
           <Button variant="ghost" block onClick={() => void navigate('/wall')}>

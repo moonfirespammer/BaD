@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { MemoryRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router';
 import { Toast } from '@/components/Toast';
 import { Board } from '@/screens/Board';
@@ -30,6 +30,8 @@ export interface BuildADishProps {
   clock?: Clock;
   /** Called when the current screen should hide the host's tab bar. */
   onImmersiveChange?: (immersive: boolean) => void;
+  /** Bumped by the host each time the Dish tab is selected: the game goes back to the Board (prototype tabTo). */
+  home?: number;
 }
 
 function IntroRoute({ city }: { city: City }) {
@@ -45,10 +47,33 @@ function IntroRoute({ city }: { city: City }) {
   );
 }
 
+function HomeWatcher({ home }: { home: number }) {
+  const navigate = useNavigate();
+  const seen = useRef(home);
+  useEffect(() => {
+    if (home === seen.current) return;
+    seen.current = home;
+    void navigate('/board');
+  }, [home, navigate]);
+  return null;
+}
+
 function ImmersiveWatcher({ onChange }: { onChange?: ((v: boolean) => void) | undefined }) {
   const { pathname } = useLocation();
+  const first = useRef(true);
   useEffect(() => {
     onChange?.(IMMERSIVE.has(pathname));
+    // After a route change the new screen's title takes focus, so keyboard and screen-reader users land on it
+    // (the first screen is left alone: nothing should grab focus on load).
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    const title = document.querySelector<HTMLElement>('[data-testid="build-a-dish"] main h1');
+    if (title) {
+      title.tabIndex = -1;
+      title.focus({ preventScroll: true });
+    }
   }, [pathname, onChange]);
   return null;
 }
@@ -63,6 +88,7 @@ export function BuildADish({
   service,
   clock = defaultClock,
   onImmersiveChange,
+  home = 0,
 }: BuildADishProps) {
   const ready = useGame((g) => g.ready);
   const introSeen = useGame((g) => g.profile?.introSeen ?? false);
@@ -75,6 +101,7 @@ export function BuildADish({
     <div className={styles.root} data-testid="build-a-dish">
       <MemoryRouter initialEntries={[introSeen ? '/board' : '/intro']}>
         <ImmersiveWatcher onChange={onImmersiveChange} />
+        <HomeWatcher home={home} />
         <Routes>
           <Route path="/intro" element={<IntroRoute city={city} />} />
           <Route path="/board" element={<Board />} />

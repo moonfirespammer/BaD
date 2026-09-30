@@ -5,10 +5,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   padding-top: var(--space-4);
 }
 .card {
+  /* Centred when there is room; on a short viewport the card scrolls from its top instead of losing it. */
+  margin: auto 0;
+  flex: none;
   width: 326px;
   max-width: 100%;
   border-radius: var(--radius-lg);

@@ -8,14 +8,20 @@ const PROTOTYPE = 'http://127.0.0.1:4174/Build-A-Dish.dc.html';
 const OUT = 'e2e/__screenshots__/compare';
 
 /** Prototype jump-chip label, and how to reach the same screen in the app. */
-const SCREENS: { name: string; chip: string; app: (page: Page) => Promise<void> }[] = [
+const SCREENS: { name: string; chip: string; leftovers?: 'on'; app: (page: Page) => Promise<void> }[] = [
   { name: 'intro', chip: 'Intro', app: () => Promise.resolve() },
   { name: 'board', chip: 'Board', app: skipIntro },
   {
     name: 'cursed-plates',
     chip: 'Cursed Plates',
     app: async (page) => {
+      // The prototype's gallery is seeded; ours needs a cursed plate first.
       await skipIntro(page);
+      await page.getByRole('button', { name: /^Hainanese chicken rice/ }).click();
+      await page.getByRole('button', { name: 'Pick chicken rice for today' }).click();
+      await page.getByRole('button', { name: 'Cook chicken rice' }).click();
+      await page.getByRole('button', { name: 'Plate it' }).click();
+      await page.getByRole('button', { name: "Back to today's dishes" }).click();
       await page.getByRole('button', { name: /^Cursed Plates · \d+$/ }).click();
     },
   },
@@ -31,29 +37,32 @@ const SCREENS: { name: string; chip: string; app: (page: Page) => Promise<void> 
     },
   },
   {
-    // The prototype's demo plate: every ingredient once, the third one ×4, the first seared.
+    // The prototype's demo plate: every ingredient once, prepped, the third one ×4 (Leftovers hour lets the 4th
+    // through), the first seared → `Seared chicken rice, drowning in ginger sauce`, Academy acceptable, 3 stones.
     name: 'verdict',
     chip: 'Verdict',
+    leftovers: 'on',
     app: async (page) => {
       await skipIntro(page);
       await page.getByRole('button', { name: /^Hainanese chicken rice/ }).click();
       await page.getByRole('button', { name: 'Pick chicken rice for today' }).click();
       await page.getByRole('button', { name: 'Cook chicken rice' }).click();
-      for (const id of [
-        'chicken',
-        'rice',
-        'ginger',
-        'ginger',
-        'ginger',
-        'ginger',
-        'chilli-sauce',
-        'cucumber',
-        'dark-soy',
-      ]) {
-        await page.getByTestId(`pantry-${id}`).getByRole('button').first().click();
-      }
+      await page.getByRole('switch', { name: 'Prefer buttons' }).click();
+      const tap = (id: string) => page.getByTestId(`pantry-${id}`).getByRole('button').first().click();
+      const press = (name: string) => page.getByRole('button', { name, exact: true }).click();
+      await tap('chicken');
+      await press('Cut');
+      await press('Heat');
+      await press('Heat');
+      await tap('rice');
+      await press('Heat');
+      for (let i = 0; i < 4; i++) await tap('ginger');
+      await tap('chilli-sauce');
+      await tap('cucumber');
+      await press('Cut');
+      await tap('dark-soy');
       await page.getByRole('button', { name: 'Plate it' }).click();
-      await page.getByRole('heading', { name: "The Bin's verdict" }).waitFor();
+      await page.getByRole('heading', { name: 'Seared chicken rice, drowning in ginger sauce' }).waitFor();
     },
   },
   {
@@ -126,7 +135,11 @@ for (const theme of THEMES) {
     for (const s of SCREENS) {
       const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
       const page = await ctx.newPage();
-      await open(page, { theme, clock: '2026-09-23T10:00' });
+      await open(page, {
+        theme,
+        clock: '2026-09-23T10:00',
+        ...(s.leftovers ? { leftovers: s.leftovers } : {}),
+      });
       await s.app(page);
       await page.waitForTimeout(300);
       const app = await page.screenshot({ animations: 'disabled' });

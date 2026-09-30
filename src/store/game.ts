@@ -113,6 +113,17 @@ async function write<T>(run: () => Promise<T>): Promise<T | null> {
   }
 }
 
+/** Send the plate to the judge and keep the verdict. Callers hold the `plating` guard. */
+async function judgeNow(): Promise<Verdict | null> {
+  const { deps, plate } = useGame.getState();
+  if (!deps) return null;
+  const verdict = await write(() => deps.service.plate(plate));
+  if (!verdict) return null;
+  useToast.getState().clear(); // plating clears the Bin toast (prototype)
+  useGame.setState({ verdict, sent: false });
+  return verdict;
+}
+
 export const useGame = create<GameState>((set, get) => ({
   ready: false,
   deps: null,
@@ -253,10 +264,21 @@ export const useGame = create<GameState>((set, get) => ({
     const { deps, plate, selectedIng, flash } = get();
     if (!deps) return null;
     const o = applySigil(plate, selectedIng, kind, fast);
+    // A PLATE already on its way (the draft is saving, or the judge is judging) makes a second one a no-op.
+    if (o.plateNow && plating) return null;
     set({ plate: o.plate, flash: { word: o.word, seq: (flash?.seq ?? 0) + 1 } });
     if (o.remark) remark(o.remark);
-    const saved = await write(() => deps.service.saveDraft(o.plate).then(() => true));
-    return saved && o.plateNow ? get().plateNow() : null;
+    if (!o.plateNow) {
+      await write(() => deps.service.saveDraft(o.plate));
+      return null;
+    }
+    plating = true;
+    try {
+      const saved = await write(() => deps.service.saveDraft(o.plate).then(() => true));
+      return saved ? await judgeNow() : null;
+    } finally {
+      plating = false;
+    }
   },
   fling: async () => {
     const { deps, plate, selectedIng } = get();
@@ -275,15 +297,10 @@ export const useGame = create<GameState>((set, get) => ({
     }
   },
   plateNow: async () => {
-    const { deps, plate } = get();
-    if (!deps || plating) return null;
+    if (plating) return null;
     plating = true;
     try {
-      const verdict = await write(() => deps.service.plate(plate));
-      if (!verdict) return null;
-      useToast.getState().clear(); // plating clears the Bin toast (prototype)
-      set({ verdict, sent: false });
-      return verdict;
+      return await judgeNow();
     } finally {
       plating = false;
     }

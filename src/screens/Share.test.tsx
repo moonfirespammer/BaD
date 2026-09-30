@@ -57,7 +57,8 @@ describe('Share card (spec §3.12, §5)', () => {
     expect(card).toHaveTextContent('Singapore · 23 Sep 2026');
     expect(card).toHaveTextContent(v?.name ?? '?');
     expect(card).toHaveTextContent(v?.line ?? '?');
-    expect(card.querySelectorAll('[role="img"][aria-label="Ruby gem, active"]')).toHaveLength(1);
+    expect(card.querySelector('[role="img"][aria-label="1 of 3 rubies"]')).toBeInTheDocument();
+    expect(card.querySelectorAll('[data-active="true"]')).toHaveLength(1);
     expect(card).toHaveTextContent('Ayu');
     expect(card).toHaveTextContent('Stirrer');
     expect(card).toHaveTextContent('Ruby');
@@ -65,7 +66,11 @@ describe('Share card (spec §3.12, §5)', () => {
     expect(card).toHaveTextContent('PLAY IT TOGETHER');
 
     await user.click(screen.getByRole('button', { name: 'Send to your party' }));
-    expect(screen.getByRole('button', { name: 'Sent to your party' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Sent to your party' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+    await user.click(screen.getByRole('button', { name: 'Sent to your party' })); // a second press does nothing
     expect(useGame.getState().sent).toBe(true);
 
     renderShareCard.mockResolvedValue('data:image/png;base64,AAAA');

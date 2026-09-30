@@ -67,8 +67,8 @@ test.describe('Phase 3: Verdict, Share card, Signature Dish, Cursed Plates', () 
       ),
     ).toBeVisible();
     await expect(page.getByText('2 of 3 rubies')).toBeVisible();
-    await expect(page.getByRole('img', { name: 'Ruby gem, active' })).toHaveCount(2);
-    await expect(page.getByRole('img', { name: 'Ruby gem', exact: true })).toHaveCount(1);
+    await expect(page.getByTestId('verdict-stones').locator('[data-active="true"]')).toHaveCount(2);
+    await expect(page.getByRole('img', { name: /Ruby gem/ })).toHaveCount(0); // the caption is the one statement
     await expect(page.getByText('Neat', { exact: true })).toBeVisible();
     await expect(page.getByText('Raw rice. Again.')).toBeVisible();
     await expect(page.getByText(/^Leftovers hour$/)).toHaveCount(0);
@@ -79,15 +79,17 @@ test.describe('Phase 3: Verdict, Share card, Signature Dish, Cursed Plates', () 
     const sig = page.getByRole('button', { name: 'Set as Signature Dish' });
     await sig.click();
     await expect(page.getByRole('button', { name: 'Signature Dish set' })).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'Signature Dish set' })).toBeFocused(); // focus is kept
 
     await page.getByRole('button', { name: 'Share to your party' }).click();
+    await expect(page.getByRole('heading', { name: 'Share card' })).toBeFocused(); // a new screen announces itself
     await expect(page.getByRole('heading', { name: 'Share card' })).toBeVisible();
     const card = page.getByTestId('share-card');
     await expect(card).toContainText('BUILD-A-DISH');
     await expect(card).toContainText('Singapore · 23 Sep 2026');
     await expect(card.getByRole('heading', { level: 2 })).toHaveText('Chicken rice');
     await expect(card).toContainText('The rice is raw. Rice is the easy part.');
-    await expect(card.getByRole('img', { name: 'Ruby gem, active' })).toHaveCount(2);
+    await expect(card.getByRole('img', { name: '2 of 3 rubies' })).toBeVisible();
     await expect(card).toContainText('Ayu');
     await expect(card).toContainText('Stirrer');
     await expect(card).toContainText('Ruby');
@@ -145,14 +147,37 @@ test.describe('Phase 3: Verdict, Share card, Signature Dish, Cursed Plates', () 
   test('Leftovers hour: ten portions → the Ten line, Leftovers hour chip, Unhinged; two extras → Wasteways', async ({
     page,
   }) => {
-    await open(page, { clock: '2026-09-23T21:30' });
+    await open(page, { clock: '2026-09-23T21:30', leftovers: 'on' }); // the override only opens the cap
     await toStation(page);
-    for (let i = 0; i < 10; i++) await tap(page, 'ginger').click();
+    await page.getByRole('switch', { name: 'Prefer buttons' }).click();
+    const press = (name: string) => page.getByRole('button', { name, exact: true }).click();
+    for (const id of ALL) await tap(page, id).click();
+    await tap(page, 'chicken').click(); // the 2nd portion keeps the selection on chicken
+    await page
+      .getByTestId('pantry-chicken')
+      .getByRole('button', { name: /^Remove one portion/ })
+      .click();
+    await press('Cut');
+    await press('Heat');
+    await chip(page, /^Chicken rice ×1/).click();
+    await press('Heat');
+    await chip(page, /^Cucumber ×1/).click();
+    await press('Cut');
+    for (let i = 0; i < 9; i++) await tap(page, 'ginger').click();
     await page.getByRole('button', { name: 'Plate it' }).click();
+    // Clean chicken rice with ginger ×10: 63 → two stones, Saucy but controlled (spec §3.5, §3.7).
     await expect(page.getByText('Ten portions of ginger sauce. Ten. I counted.')).toBeVisible();
+    await expect(page.getByText('2 of 3 rubies')).toBeVisible();
+    await expect(page.getByText('Saucy but controlled')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2 })).toHaveText(
+      'Chicken rice, drowning in ginger sauce',
+    );
     await expect(page.getByText('Unhinged', { exact: true })).toBeVisible();
     await expect(page.getByText('Leftovers hour', { exact: true })).toBeVisible();
     await expect(page.getByText('Unhinged plate ×1 this month')).toBeVisible();
+    const footer = page.getByText(/^The Bin has eaten [\d,]+ plates in Singapore today\.$/);
+    const eaten = async () => Number((await footer.textContent())?.replace(/\D/g, ''));
+    const before = await eaten();
     await page.getByRole('button', { name: "Back to today's dishes" }).click();
     await page.getByRole('button', { name: 'Cook chicken rice' }).click();
     await tap(page, 'durian').click();
@@ -161,7 +186,9 @@ test.describe('Phase 3: Verdict, Share card, Signature Dish, Cursed Plates', () 
     await expect(page.getByText('Durian. In chicken rice. I will be filing a report.')).toBeVisible();
     await expect(page.getByText('Something below said thank you. That is not normal.')).toBeVisible();
     await expect(page.getByText('Cursed plate', { exact: true })).toBeVisible();
-    await expect(page.getByText(/^The Bin has eaten [\d,]+ plates in Singapore today\.$/)).toBeVisible();
+    await expect(page.getByText('1 of 3 rubies')).toBeVisible();
+    await expect(page.getByText('CURSED PLATE · meant to be chicken rice')).toBeVisible();
+    expect(await eaten()).toBe(before + 1); // the footer counts every plate
   });
 
   test('keyboard only: Plate it → Set as Signature Dish → Share → Send', async ({ page }) => {
@@ -200,8 +227,19 @@ for (const theme of THEMES) {
     await expectNoAxeViolations(page, `share ${theme}`);
     await expectHitTargets(page, `share ${theme}`);
     await shot(page, `share-${theme}`);
+    await page.getByRole('button', { name: 'Send to your party' }).click();
+    await expect(page.getByRole('button', { name: 'Sent to your party' })).toBeDisabled();
+    await expectNoAxeViolations(page, `share sent ${theme}`);
     await page.getByRole('button', { name: 'Back to the verdict' }).click();
+    await page.getByRole('button', { name: 'Set as Signature Dish' }).click();
     await page.getByRole('button', { name: "Back to today's dishes" }).click();
+    await expect(page.getByText('Cooking today')).toBeVisible();
+    const nav = page.getByRole('navigation', { name: 'Main' });
+    await nav.getByRole('button', { name: 'You' }).click();
+    await expect(page.getByText('Ruby Stirrer · 1 plates this month')).toBeVisible();
+    await expect(page.getByText('Comforting · 23 Sep 2026')).toBeVisible();
+    await nav.getByRole('button', { name: 'Dish' }).click(); // the Dish tab always lands on the Board
+    await expect(page.getByRole('heading', { name: "Today's dishes" })).toBeVisible();
     await page.getByRole('button', { name: 'Cook chicken rice' }).click();
     await tap(page, 'durian').click();
     await tap(page, 'cheddar').click();

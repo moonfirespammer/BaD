@@ -23,6 +23,7 @@ export function App() {
   const tab = useShell((s) => s.tab);
   const setTab = useShell((s) => s.setTab);
   const immersive = useShell((s) => s.immersive);
+  const dishHome = useShell((s) => s.dishHome);
   const setImmersive = useShell((s) => s.setImmersive);
   const ready = useGame((g) => g.ready);
 
@@ -62,6 +63,7 @@ export function App() {
             service={deps.service}
             clock={deps.clock}
             onImmersiveChange={setImmersive}
+            home={dishHome}
           />
         </div>
       </div>

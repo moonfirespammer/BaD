@@ -85,7 +85,8 @@ export function Art({
       data-art={`${slot}/${id}`}
       data-placeholder=""
     >
-      <span className={styles.caption} aria-hidden={alt ? true : undefined}>
+      {/* The slot name is a stand-in for eyes only; the image's meaning, if any, is in `alt`. */}
+      <span className={styles.caption} aria-hidden="true">
         {caption}
       </span>
     </div>

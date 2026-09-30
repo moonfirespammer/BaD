@@ -154,6 +154,15 @@ describe('judge (spec §3.5–3.9)', () => {
     });
   });
 
+  it('stone boundaries: 44 → one, 45 → two, 74 → two, 75 → three (spec §3.5)', () => {
+    const at = (items: PlateItem[], flair: number) => judge(CR, plate(items, flair), H0);
+    expect(at([item('chicken', 1, 3, 0)], 1)).toMatchObject({ score: 44, stones: 1, cursed: false }); // 58 − 6 − 10 + 2
+    expect(at([item('chicken', 1, 0, 3)], 5)).toMatchObject({ score: 45, stones: 2 }); // 58 − 8 − 15 + 10
+    const comforting = withItem(withItem(clean(), 'chicken', { cut: 0, heat: 0 }), 'cucumber', { cut: 0 });
+    expect(at(comforting, 0)).toMatchObject({ score: 74, stones: 2 });
+    expect(at(withItem(comforting, 'rice', { n: 2 }), 2)).toMatchObject({ score: 75, stones: 3 }); // −3 excess, +4
+  });
+
   it("the Bin's line: air > durian > portions > burnt > raw rice > tier line (spec §3.8)", () => {
     const base = clean();
     expect(judge(CR, plate([...withItem(base, 'ginger', { n: 8 }), item('durian')]), H0).line).toBe(

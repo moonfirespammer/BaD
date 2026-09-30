@@ -36,7 +36,8 @@
   background: transparent;
   color: var(--brand-text);
 }
-.btn:disabled {
+.btn:disabled,
+.btn[aria-disabled='true'] {
   background: var(--surface-sunken);
   color: var(--ink-faint);
   border-color: transparent;

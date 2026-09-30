@@ -46,6 +46,16 @@ describe('Verdict store actions (spec §3.5–3.13)', () => {
     expect(g().plate.items).toHaveLength(1); // the plate stays for another go
   });
 
+  it('a PLATE flick chased by Plate it while the draft is still saving plates once', async () => {
+    const deps = await boot();
+    const plate = vi.spyOn(deps.service, 'plate');
+    const [a, b] = await Promise.all([g().stroke('plate', true), g().stroke('plate', false)]);
+    expect(plate).toHaveBeenCalledTimes(1);
+    expect(a).not.toBeNull();
+    expect(b).toBeNull();
+    expect(g().profile?.habits.plates).toBe(1);
+  });
+
   it('Plate it and a double tap: one plate per press', async () => {
     const deps = await boot();
     const plate = vi.spyOn(deps.service, 'plate');

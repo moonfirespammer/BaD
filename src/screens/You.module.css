@@ -67,7 +67,7 @@
   min-width: 0;
 }
 .sigStones {
-  padding-top: 6px;
+  padding-top: 4px; /* + the row's own 2px = the prototype's 6px */
 }
 .strong {
   font: var(--text-body-strong);

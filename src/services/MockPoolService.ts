@@ -336,10 +336,14 @@ export class MockPoolService implements PoolService {
       this.mergeDraft(day, plate);
       const d = dish(day.pick.dishId);
       const p = this.profile.get();
-      const verdict = judge(d, day.plate, p.habits);
+      // Counters are month-scoped (spec §3.9): a plate in a new month starts from zero, reload or not.
+      const month = this.clock.city().month;
+      const habits =
+        p.habits.month === month ? p.habits : { chilli: 0, rawRice: 0, unhinged: 0, plates: 0, month };
+      const verdict = judge(d, day.plate, habits);
       const date = formatDate(this.clock.now());
       await this.profile.update({
-        habits: applyVerdict(p.habits, verdict),
+        habits: applyVerdict(habits, verdict),
         cursedPlates: verdict.cursed ? [{ ...verdict, date }, ...p.cursedPlates] : p.cursedPlates,
       });
       day.binEatenExtra += 1;

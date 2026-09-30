@@ -58,6 +58,7 @@ Leftovers hour lifts the cap above 25 (plenty and moderate), per spec §3.3.
 | `Ingredient` | `assetKey` | Maps prototype ids to the asset brief's file keys. |
 | `StockState` | `'plenty' \| 'moderate' \| 'low' \| 'gone'` | Q5 (spec had three states). |
 | `PoolService` | `getPick`, `getPlate`, `fling`, `report`, `mute` | Restore state on reload; fling bumps the Bin-eaten counter (spec §3.4); moderation stubs (Phase 4). |
+| `<BuildADish>` | `home?: number` prop (Phase 3 review) | The host bumps it when the Dish tab is selected; the game returns to the Board (prototype `tabTo`). |
 | `<BuildADish>` | `clock?`, `onImmersiveChange?` props | Time source for tests and dev; lets the host hide its tab bar (spec §5). |
 | `PoolService` | `saveDraft(plate)` (Phase 2) | The in-progress plate's prep, flair and mess survive a reload; portions stay server-owned. |
 | `Profile` | `preferButtons?: boolean` (Phase 2) | Spec §10 "Prefer buttons" setting (Cut and Heat buttons under the pad). |
@@ -119,9 +120,26 @@ These follow the questions register's literal readings (register Q45–Q60, Q03,
 - **No Bin toasts** on Set as Signature Dish, Send to your party or Save image — the buttons change state only (register Q47; the prototype's three lines are listed under Questions).
 - **Dates** (register Q54): `d Mon yyyy` in city time for the gallery, the Signature Dish and the Share card; never `Today`.
 - **Cursed Plates** (register Q55): `{n}` is the player's all-time count; an empty gallery is blank; three mini stones with one lit.
-- **Share screen** (register Q57): a 56px header with a 44px back button (`Back to the verdict`, the prototype's label) and the title `Share card`; the card is 326px; `Save image` renders the card's DOM to a 2× PNG with html-to-image after the fonts have loaded (register Q60) and offers `build-a-dish-{yyyy-mm-dd}.png`.
+- **Share screen** (register Q57): a 56px header with a 44px back button (`Back to the verdict`, the prototype's label) and the title `Share card`; the card is 326px; `Save image` renders the card's DOM to a 2× PNG with html-to-image after the fonts have loaded (register Q60) and offers `build-a-dish-{yyyy-mm-dd}.png`. Below about 358px of viewport the card shrinks to the width left by the gutters (no sideways scroll) and the saved PNG comes out narrower than 326px; at the spec's 390px it is 326px.
 - **Routes** (register Q03): Verdict × → Board; Share back → Verdict; `See who else made {dish}` → the wall, which is Phase 4 — until then it lands on the Board.
 - **Bin pose** by verdict through Art (kickoff follow-up prompt): 3 stones `approving`, 2 `judging`, 1 `neutral`, cursed `disgusted`; the cursed render key is the Base word (`empty` for a plate of air). No dish render on the Verdict (spec §5 lists only the Bin slot; the asset brief's "up to 200px on the verdict" is listed under Questions).
 - **StoneRow**: the Phase 1 `MiniStones` component is renamed to the kickoff's `StoneRow`.
 - **Plating clears the Bin toast** (prototype) and a double tap on Plate it plates once.
+- **The verdict lives in memory** (register Q14): the current verdict and the Share card's sent state are not persisted; a reload lands on the Board with `Cook {dish}`, and getting a Verdict back means plating again (which counts again, per the Q49 default). The wall row, the gallery and the Signature Dish do persist.
+- **File names**: the Share screen is `Share.tsx` (the kickoff's project shape says `ShareCard`); the card inside it is the share card.
+- **Commits**: Phase 3 landed as a feature commit, a test commit and a review-fix commit (the kickoff asks for one per phase); pushed history is never rewritten.
+
+## Phase 3 review fixes (30 Sep 2026)
+
+- **Month rollover while open**: a plate in a new month starts the counters from zero without a reload (spec §3.9).
+- **One plate per press**: a PLATE already on its way (draft saving or judge judging) makes a second press a no-op, and the Station ignores presses once a verdict is on its way to the screen.
+- **Signature Dish set** means this very verdict: same plate, dish, stones and label, today. The same plate judged higher (flair) may replace the earlier signature.
+- **Done-state buttons** (`Signature Dish set`, `Sent to your party`): `aria-disabled` instead of `disabled`, so keyboard focus stays and the new label is announced; presses do nothing.
+- **A new screen announces itself**: after a route change the screen title takes focus.
+- **Stones for assistive tech**: one statement (`{n} of 3 rubies`) per row; the sockets are decorative. Verdict chips and gallery cards are lists; gallery names are headings; Art slot captions are hidden from assistive tech.
+- **Share card on short viewports** scrolls from its top instead of losing the logo under the header.
+- **Share card city** comes from the game's city, not the profile's.
+- **Dish tab** always lands on the Board (prototype `tabTo`), through a `home` counter prop on `<BuildADish>`.
+- Tagline lines never wrap; Signature Dish stones sit 6px under the caption as the prototype.
+- **Kept**: below 360px the Verdict title ellipsises next to the countdown (the spec's target is 390px).
 

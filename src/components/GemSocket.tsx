@@ -9,10 +9,19 @@ export interface GemSocketProps {
   size?: number;
   onClick?: () => void;
   label?: string;
+  /** Part of a bigger picture (a stones row) that carries the label; this socket is hidden from assistive tech. */
+  decorative?: boolean;
 }
 
 /** A recessed well holding one gem. Ruby round, Sapphire rounded square, Emerald 45° diamond (OraX GemSocket). */
-export function GemSocket({ gem, active = false, size = 72, onClick, label }: GemSocketProps) {
+export function GemSocket({
+  gem,
+  active = false,
+  size = 72,
+  onClick,
+  label,
+  decorative = false,
+}: GemSocketProps) {
   const g = GEMS[gem];
   const stone = Math.round(size * 0.57);
   const diamond = gem === 'emerald';
@@ -58,6 +67,18 @@ export function GemSocket({ gem, active = false, size = 72, onClick, label }: Ge
       >
         {img}
       </button>
+    );
+  }
+  if (decorative) {
+    return (
+      <div
+        className={styles.socket}
+        style={{ width: size, height: size }}
+        aria-hidden="true"
+        data-active={active}
+      >
+        {img}
+      </div>
     );
   }
   return (

@@ -10,6 +10,7 @@ import { COPY, fill } from '@/game/content/copy';
 import { EXTRAS, ingredient } from '@/game/content/ingredients';
 import { CITY_NAME } from '@/game/content/identity';
 import { portionStyle, prepText, styleWord } from '@/game/station';
+import type { SigilKind } from '@/game/sigils';
 import type { Verdict } from '@/game/types';
 import { useGame } from '@/store/game';
 import s from './screens.module.css';
@@ -27,6 +28,8 @@ export function Station() {
   const preferButtons = useGame((g) => g.profile?.preferButtons ?? false);
   useGame((g) => g.now); // re-render every second for the countdown
   const plateCard = useRef<HTMLElement>(null);
+  /** Set once a plate has come back: presses that land before the Verdict replaces this screen are ignored. */
+  const leaving = useRef(false);
   const g = useGame.getState();
   if (!board || !deps) return null;
   if (!pick) return <Navigate to="/board" replace />;
@@ -55,7 +58,13 @@ export function Station() {
   const selectedItem = items.find((i) => i.ingredientId === selectedIng);
   /** A stroke or Plate it that plated the dish opens the Verdict. */
   const plated = (v: Verdict | null): void => {
-    if (v) void navigate('/verdict');
+    if (!v || leaving.current) return;
+    leaving.current = true;
+    void navigate('/verdict');
+  };
+  const strokeNow = (kind: SigilKind, fast: boolean): void => {
+    if (leaving.current) return;
+    void g.stroke(kind, fast).then(plated);
   };
   const [applyPre, applyPost] = COPY.station.strokesApply.split('{item}');
 
@@ -141,18 +150,14 @@ export function Station() {
           </div>
         </section>
 
-        <SigilPad
-          mess={plate.mess}
-          flash={flash}
-          onSigil={(sig) => void g.stroke(sig.kind, sig.fast).then(plated)}
-        />
+        <SigilPad mess={plate.mess} flash={flash} onSigil={(sig) => strokeNow(sig.kind, sig.fast)} />
         <div className={styles.buttonsRow}>
           {preferButtons ? (
             <div className={styles.prepButtons}>
-              <Button variant="secondary" onClick={() => void g.stroke('cut', false)}>
+              <Button variant="secondary" onClick={() => strokeNow('cut', false)}>
                 {COPY.station.cut}
               </Button>
-              <Button variant="secondary" onClick={() => void g.stroke('heat', false)}>
+              <Button variant="secondary" onClick={() => strokeNow('heat', false)}>
                 {COPY.station.heat}
               </Button>
             </div>
@@ -187,7 +192,7 @@ export function Station() {
       </div>
 
       <div className={`${s.cta} ${styles.footer}`}>
-        <Button block onClick={() => void g.stroke('plate', false).then(plated)}>
+        <Button block onClick={() => strokeNow('plate', false)}>
           {COPY.station.plateIt}
         </Button>
         <p className={`${s.caption} ${styles.plateHint}`}>{COPY.station.plateHint}</p>

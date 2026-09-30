@@ -131,6 +131,23 @@ describe('MockPoolService.plate (spec §7, §3.5–3.9)', () => {
     expect(profile.get().habits).toMatchObject({ chilli: 2, plates: 2 });
   });
 
+  it('a plate in a new month starts the counters from zero, without a reload', async () => {
+    const { service, profile, advance } = await setup('2026-09-30T23:59:00');
+    await service.pick('chicken-rice');
+    await service.takePortion('chilli-sauce');
+    await service.takePortion('chilli-sauce');
+    await service.plate(prepped([{ id: 'chilli-sauce', n: 2 }]));
+    expect(profile.get().habits).toMatchObject({ chilli: 1, plates: 1, month: '2026-09' });
+    advance(2 * 60_000); // 1 Oct 00:01, same open session — the pick is gone with the day
+    await expect(service.plate(prepped([]))).rejects.toMatchObject({ code: 'not-picked' });
+    await service.pick('chicken-rice');
+    await service.takePortion('chilli-sauce');
+    await service.takePortion('chilli-sauce');
+    const v = await service.plate(prepped([{ id: 'chilli-sauce', n: 2 }]));
+    expect(v.habit).toBe('You doubled the chilli again · ×1');
+    expect(profile.get().habits).toEqual({ chilli: 1, rawRice: 0, unhinged: 0, plates: 1, month: '2026-10' });
+  });
+
   it('the wall row and the gallery survive a reload; setSignature stores the verdict with its date', async () => {
     const storage = createMemoryStorage();
     const first = await setup('2026-09-23T12:00:00', storage);

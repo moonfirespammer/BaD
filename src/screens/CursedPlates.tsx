@@ -31,9 +31,9 @@ export function CursedPlates() {
         </div>
       </div>
       <div className={s.scroll}>
-        <div className={styles.grid}>
+        <ul className={styles.grid}>
           {plates.map((v, i) => (
-            <div key={`${v.key}-${i}`} className={`${s.card} ${styles.card}`}>
+            <li key={`${v.key}-${i}`} className={`${s.card} ${styles.card}`}>
               <Art
                 slot="cursed"
                 id={cursedRenderKey(v.name)}
@@ -41,15 +41,15 @@ export function CursedPlates() {
                 radius="sm"
                 caption={COPY.art.render}
               />
-              <div className={styles.name}>{v.name}</div>
+              <h2 className={styles.name}>{v.name}</h2>
               <div className={s.caption}>
                 {v.hint} · {v.date}
               </div>
               <div className={s.caption}>{v.line}</div>
               <StoneRow gem={profile.gem} stones={1} />
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </main>
   );

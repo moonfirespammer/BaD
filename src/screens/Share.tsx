@@ -8,7 +8,7 @@ import { Icon } from '@/components/Icon';
 import { Logo } from '@/components/Logo';
 import { Tagline } from '@/components/Tagline';
 import { COPY, fill } from '@/game/content/copy';
-import { CITY_NAME, CLASSES } from '@/game/content/identity';
+import { CITY_NAME, CLASSES, GEMS } from '@/game/content/identity';
 import { formatDate } from '@/services/clock';
 import { downloadImage, renderShareCard } from '@/services/shareImage';
 import { useGame } from '@/store/game';
@@ -63,13 +63,17 @@ export function Share() {
             <span className={`${s.pixel} ${styles.pixel}`}>{COPY.app.pixelLabel}</span>
           </div>
           <span className={s.overline}>
-            {fill(COPY.share.overline, { CITY: CITY_NAME[profile.city], date })}
+            {fill(COPY.share.overline, { CITY: CITY_NAME[deps.city], date })}
           </span>
           <h2 className={styles.name}>{verdict.name}</h2>
           <p className={styles.line}>{verdict.line}</p>
-          <div className={styles.stones}>
+          <div
+            className={styles.stones}
+            role="img"
+            aria-label={fill(COPY.verdict.stones, { n: verdict.stones, gems: GEMS[profile.gem].plural })}
+          >
             {[1, 2, 3].map((k) => (
-              <GemSocket key={k} gem={profile.gem} active={k <= verdict.stones} size={44} />
+              <GemSocket key={k} gem={profile.gem} active={k <= verdict.stones} size={44} decorative />
             ))}
           </div>
           <div className={styles.me}>
@@ -87,7 +91,7 @@ export function Share() {
       </div>
 
       <div className={`${s.cta} ${styles.actions}`}>
-        <Button block disabled={sent} onClick={sendToParty}>
+        <Button block done={sent} onClick={sendToParty}>
           {sent ? COPY.share.sent : COPY.share.send}
         </Button>
         <Button variant="secondary" block disabled={saving} onClick={() => void save()}>
